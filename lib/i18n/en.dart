@@ -1,0 +1,429 @@
+/// English strings. Keys are grouped by feature. Every key here MUST exist
+/// in bn.dart with the same spelling — see the i18n key-adding rule in
+/// CONTRACT.md (add to BOTH files in the same change).
+const Map<String, String> enStrings = {
+  // Common
+  'common.appName': 'StreamBox',
+  'common.ok': 'OK',
+  'common.cancel': 'Cancel',
+  'common.retry': 'Retry',
+  'common.loading': 'Loading…',
+  'common.error': 'Something went wrong',
+  'common.errorGeneric': 'Something went wrong. Please try again.',
+  'common.search': 'Search',
+  'common.seeAll': 'See all',
+  'common.save': 'Save',
+  'common.delete': 'Delete',
+  'common.share': 'Share',
+  'common.download': 'Download',
+  'common.play': 'Play',
+  'common.back': 'Back',
+  'common.done': 'Done',
+  'common.next': 'Next',
+  'common.skip': 'Skip',
+  'common.getStarted': 'Get started',
+  'common.close': 'Close',
+  'common.edit': 'Edit',
+  'common.remove': 'Remove',
+  'common.add': 'Add',
+  'common.confirm': 'Confirm',
+  'common.yes': 'Yes',
+  'common.no': 'No',
+  'common.comingSoon': 'Coming soon',
+  'common.tryAgain': 'Try again',
+  'common.episodes': 'Episodes',
+  'common.chapters': 'Chapters',
+
+  // Validation (returned by Validators as keys)
+  'validation.required': 'This field is required',
+  'validation.emailInvalid': 'Enter a valid email address',
+  'validation.passwordShort': 'Password must be at least 8 characters',
+  'validation.nameShort': 'Name is too short',
+  'validation.nameLong': 'Name is too long',
+  'validation.urlInvalid': 'Enter a valid http(s) URL',
+  'validation.urlNotJson': 'Provider URL must end in .json',
+
+  // Auth
+  'auth.welcomeTitle': 'Your shows, your way',
+  'auth.welcomeSubtitle':
+      'Anime, movies, manga and manhwa from your own providers — all in one place, all offline-first.',
+  'auth.login': 'Log in',
+  'auth.signup': 'Sign up',
+  'auth.logout': 'Log out',
+  'auth.email': 'Email',
+  'auth.password': 'Password',
+  'auth.name': 'Name',
+  'auth.nameHint': 'Your name',
+  'auth.emailHint': 'you@example.com',
+  'auth.passwordHint': 'At least 8 characters',
+  'auth.noAccount': "Don't have an account?",
+  'auth.haveAccount': 'Already have an account?',
+  'auth.createAccount': 'Create account',
+  'auth.loginTitle': 'Welcome back',
+  'auth.signupTitle': 'Create your account',
+  'auth.codeTitle': 'Your device code',
+  'auth.codeSubtitle':
+      'This code unlocks your account on this device. Keep it safe — you need it to log in.',
+  'auth.codeHint': 'SB-XXXX-XXXX-XXXX',
+  'auth.codeInvalid': 'That code doesn’t look right',
+  'auth.codeCopied': 'Code copied',
+  'auth.loginFailed': 'Login failed. Check your details and try again.',
+  'auth.signupFailed': 'Couldn’t create the account. Please try again.',
+  'auth.continueWithCode': 'Continue with code',
+  'auth.yourCode': 'Your code',
+  'auth.saveYourCode': 'Save this code somewhere safe',
+  'auth.codeWarning':
+      'Without this code you can’t log in on a new device or restore a backup.',
+  'auth.deviceCode': 'Device code',
+  'auth.loginSuccess': 'Logged in — welcome back!',
+  'auth.accountCreated': 'Account created!',
+  'auth.errorWrongEmail': 'No account uses that email address.',
+  'auth.errorWrongPassword': 'That password doesn’t match our records.',
+  'auth.errorWrongCode': 'That device code is incorrect.',
+  'auth.errorAccountExists':
+      'An account already exists on this device. Log in instead.',
+  'auth.iSavedMyCode': 'I saved my code',
+  'auth.forgotCodeHint':
+      'Your code was shown once when you signed up. Check where you saved it — without it, you can’t log in or restore a backup.',
+  'auth.showPassword': 'Show password',
+  'auth.hidePassword': 'Hide password',
+  'auth.signupSubtitle':
+      'Your account lives only on this device — no server, no tracking.',
+  'auth.loginSubtitle':
+      'Enter your email, password and device code to continue.',
+  'auth.loginSuccessBody': 'Signed in as {name}.',
+  'auth.checkingSession': 'Checking your session…',
+  'auth.deleteAccount': 'Delete account',
+  'auth.deleteAccountConfirm':
+      'Delete your account and all its data on this device? Your library, history and profile will be gone for good.',
+  'auth.accountDeleted': 'Account deleted.',
+  'auth.creatingAccount': 'Creating account…',
+  'auth.loggingIn': 'Logging in…',
+  'auth.tapToContinue': 'Tap anywhere to continue',
+
+  // Onboarding
+  'onboarding.slide1Title': 'Everything you love, one app',
+  'onboarding.slide1Body':
+      'Anime, movies, manga and manhwa — stream and read without switching apps.',
+  'onboarding.slide2Title': 'Your providers, your catalog',
+  'onboarding.slide2Body':
+      'Add JSON catalog repos and browse them together. No account on any server.',
+  'onboarding.slide3Title': 'Private by design',
+  'onboarding.slide3Body':
+      'Your library, history and backups stay on your device. You hold the key.',
+
+  // Home
+  'home.title': 'Home',
+  'home.greeting': 'Good evening',
+  'home.continueWatching': 'Continue watching',
+  'home.trendingNow': 'Trending now',
+  'home.topRated': 'Top rated',
+  'home.newReleases': 'New releases',
+  'home.recommended': 'Recommended for you',
+  'home.myList': 'My List',
+  'home.becauseYouWatched': 'Because you watched',
+  'home.emptyTitle': 'Nothing here yet',
+  'home.emptyBody':
+      'Add a provider in Settings to fill your home screen with shows and comics.',
+
+  // Search
+  'search.title': 'Search',
+  'search.hint': 'Search anime, movies, manga…',
+  'search.filters': 'Filters',
+  'search.sortBy': 'Sort by',
+  'search.sortRelevance': 'Relevance',
+  'search.sortRating': 'Rating',
+  'search.sortYear': 'Year',
+  'search.sortAZ': 'A–Z',
+  'search.resultsCount': '{count} results',
+  'search.noResultsTitle': 'No results found',
+  'search.noResultsBody': 'Try a different title, or check your spelling.',
+  'search.recent': 'Recent searches',
+  'search.clearAll': 'Clear all',
+  'search.allTypes': 'All types',
+  'search.typeAnime': 'Anime',
+  'search.typeMovie': 'Movies',
+  'search.typeManga': 'Manga',
+  'search.typeManhwa': 'Manhwa',
+
+  // Manga
+  'manga.title': 'Manga & Manhwa',
+  'manga.tab': 'Manga',
+  'manga.all': 'All comics',
+  'manga.popular': 'Popular',
+  'manga.latestChapters': 'Latest chapters',
+  'manga.readNow': 'Read now',
+  'manga.continueReading': 'Continue reading',
+  'manga.chaptersCount': '{count} chapters',
+
+  // Library
+  'library.title': 'Library',
+  'library.myListEmpty': 'Your list is empty',
+  'library.myListEmptyBody': 'Tap the bookmark on any title to save it here.',
+  'library.favoritesEmpty': 'No favorites yet',
+  'library.favoritesEmptyBody': 'Tap the heart on any title to favorite it.',
+  'library.historyEmpty': 'No history yet',
+  'library.historyEmptyBody': 'Shows and chapters you watch will appear here.',
+  'library.favorites': 'Favorites',
+  'library.history': 'History',
+  'library.clearHistory': 'Clear history',
+  'library.addedToList': 'Added to My List',
+  'library.removedFromList': 'Removed from My List',
+  'library.addedToFavorites': 'Added to favorites',
+  'library.removedFromFavorites': 'Removed from favorites',
+
+  // Profile
+  'profile.title': 'Profile',
+  'profile.editProfile': 'Edit profile',
+  'profile.myStats': 'My stats',
+  'profile.watched': 'Watched',
+  'profile.read': 'Chapters read',
+  'profile.saved': 'Saved',
+  'profile.memberSince': 'Member since',
+  'profile.about': 'About',
+
+  // Settings
+  'settings.title': 'Settings',
+  'settings.appearance': 'Appearance',
+  'settings.theme': 'Theme',
+  'settings.themeSystem': 'System',
+  'settings.themeDark': 'Dark',
+  'settings.themeLight': 'Light',
+  'settings.language': 'Language',
+  'settings.languageEnglish': 'English',
+  'settings.languageBangla': 'বাংলা',
+  'settings.notifications': 'Notifications',
+  'settings.notificationsDesc': 'New episodes and chapters from your providers',
+  'settings.providers': 'Providers',
+  'settings.backup': 'Backup & restore',
+  'settings.aboutApp': 'About StreamBox',
+  'settings.version': 'Version',
+  'settings.signOut': 'Sign out',
+  'settings.signOutConfirm': 'Sign out of this device?',
+  'settings.account': 'Account',
+
+  // Providers
+  'providers.title': 'Providers',
+  'providers.subtitle':
+      'Providers are JSON catalogs. Add a repo URL to browse its anime, movies, manga and manhwa.',
+  'providers.addProvider': 'Add provider',
+  'providers.providerName': 'Provider name',
+  'providers.providerUrl': 'Repo JSON URL',
+  'providers.providerUrlHint': 'https://example.com/catalog.json',
+  'providers.builtIn': 'Built-in',
+  'providers.enabled': 'Enabled',
+  'providers.disabled': 'Disabled',
+  'providers.lastFetched': 'Last updated',
+  'providers.itemCount': '{count} items',
+  'providers.removeProvider': 'Remove provider',
+  'providers.providerAdded': 'Provider added',
+  'providers.providerInvalid': 'Couldn’t read that catalog. Check the URL.',
+  'providers.refreshAll': 'Refresh all',
+  'providers.sampleCatalog': 'Sample catalog',
+  'providers.addRepo': 'Add repo',
+  'providers.addViaUrl': 'Add via URL',
+  'providers.addViaJson': 'Paste JSON',
+  'providers.pasteJsonLabel': 'Repo JSON',
+  'providers.pasteJsonHint': 'Paste the repo JSON here…',
+  'providers.loadExample': 'Load example',
+  'providers.exampleLoaded': 'Example JSON loaded',
+  'providers.refresh': 'Refresh',
+  'providers.removeConfirm': 'Remove “{name}” and its {count} items?',
+  'providers.providerRemoved': 'Provider removed',
+  'providers.providerRefreshed': 'Provider refreshed',
+  'providers.refreshFailed': 'Refresh failed',
+  'providers.noAddedRepos': 'No added providers yet',
+  'providers.noAddedReposBody':
+      'Add a repo URL or paste JSON to browse another catalog alongside the sample.',
+  'providers.neverFetched': 'Never updated',
+  'providers.cantDeleteBuiltIn':
+      'The built-in catalog can’t be removed, but you can turn it off.',
+  'providers.adding': 'Adding provider…',
+  'providers.refreshing': 'Refreshing…',
+  'providers.invalidJson':
+      'That JSON couldn’t be read. Check it and try again.',
+
+  // Player
+  'player.episode': 'Episode {number}',
+  'player.nextEpisode': 'Next episode',
+  'player.previousEpisode': 'Previous episode',
+  'player.playbackSpeed': 'Speed',
+  'player.quality': 'Quality',
+  'player.nowPlaying': 'Now playing',
+  'player.upNext': 'Up next',
+  'player.resumeFrom': 'Resume from {time}',
+  'player.markWatched': 'Mark as watched',
+  'player.noVideo': 'No video available for this episode.',
+  'player.itemNotFound':
+      'This title couldn’t be found. It may have been removed from your providers.',
+  'player.videoFailed':
+      'This video couldn’t be played. Check your connection or try another episode.',
+  'player.skipBack10': 'Back 10 seconds',
+  'player.skipForward10': 'Forward 10 seconds',
+  'player.fullscreen': 'Fullscreen',
+  'player.exitFullscreen': 'Exit fullscreen',
+  'player.openInBrowser': 'Open in browser',
+  'player.episodes': 'Episodes',
+  'player.noMoreEpisodes': 'That was the last episode.',
+  'player.replay': 'Replay',
+
+  // Reader
+  'reader.chapter': 'Chapter {number}',
+  'reader.page': 'Page {current} of {total}',
+  'reader.nextChapter': 'Next chapter',
+  'reader.previousChapter': 'Previous chapter',
+  'reader.verticalScroll': 'Vertical scroll',
+  'reader.pageTurn': 'Page by page',
+  'reader.noPages': 'No pages available for this chapter.',
+  'reader.settings': 'Reader settings',
+  'reader.readingMode': 'Reading mode',
+  'reader.brightness': 'Brightness',
+  'reader.chapters': 'Chapters',
+  'reader.pagesCount': '{count} pages',
+  'reader.itemNotFound':
+      'This title couldn’t be found. It may have been removed from your providers.',
+  'reader.failedToLoadPage': 'Couldn’t load this page.',
+
+  // Backup
+  'backup.title': 'Backup & restore',
+  'backup.subtitle':
+      'Export an encrypted backup of your library, history and settings. Your device code unlocks it.',
+  'backup.export': 'Export backup',
+  'backup.import': 'Import backup',
+  'backup.exported': 'Backup exported',
+  'backup.imported': 'Backup restored',
+  'backup.failed': 'Backup failed. Please try again.',
+  'backup.warning':
+      'Keep the backup file and your device code together — one without the other can’t restore anything.',
+  'backup.chooseFile': 'Choose backup file',
+  'backup.noBackupFound': 'No backup found in that file.',
+  'backup.restoreConfirm': 'Replace your current data with this backup?',
+  'backup.restoreConfirmBody':
+      'Importing will replace your profile, library, history and providers with the backup’s data. This can’t be undone.',
+  'backup.codePrompt': 'Enter your device code',
+  'backup.codePromptBody':
+      'Your code locks this backup. Only this code can open it again.',
+  'backup.exportDesc':
+      'Save an encrypted copy of your profile, library, history, providers and settings to a .sbbackup file.',
+  'backup.importDesc':
+      'Restore everything from a .sbbackup file you exported earlier. Your current data will be replaced.',
+  'backup.codeAloneNote':
+      'There is no server: your code alone cannot fetch your data on a new device. The backup file is the carrier — keep the file and the code together.',
+  'backup.wrongCode':
+      'That code couldn’t unlock this backup. Check the code, or the file may be damaged.',
+  'backup.invalidFile': 'That file doesn’t look like a StreamBox backup.',
+  'backup.exportCancelled': 'Export cancelled.',
+  'backup.exporting': 'Encrypting backup…',
+  'backup.restoring': 'Restoring backup…',
+  'backup.exportedTo': 'Backup saved as {file}.',
+  'backup.selectedFile': 'Selected file',
+  'backup.signInAgain':
+      'Backup restored. Log in again with the restored account.',
+  'backup.unlockBackup': 'Unlock backup',
+
+  // Details
+  'details.overview': 'Overview',
+  'details.genres': 'Genres',
+  'details.year': 'Year',
+  'details.rating': 'Rating',
+  'details.status': 'Status',
+  'details.ongoing': 'Ongoing',
+  'details.completed': 'Completed',
+  'details.watchNow': 'Watch now',
+  'details.readNow': 'Read now',
+  'details.addToList': 'Add to My List',
+  'details.inList': 'In My List',
+  'details.favorite': 'Favorite',
+  'details.episodesList': 'Episodes',
+  'details.chaptersList': 'Chapters',
+
+  // --- Screens workstream additions --------------------------------------
+
+  // Common
+  'common.all': 'All',
+
+  // Splash
+  'splash.tagline': 'Anime, movies, manga & manhwa — your way',
+
+  // Home
+  'home.greetingMorning': 'Good morning',
+  'home.greetingAfternoon': 'Good afternoon',
+  'home.greetingEvening': 'Good evening',
+  'home.trendingAnime': 'Trending anime',
+  'home.moviesRow': 'Movies',
+  'home.mangaRow': 'Manga & manhwa',
+  'home.newChapters': 'New chapters',
+  'home.addProvider': 'Add a provider',
+  'home.details': 'Details',
+  'home.refreshFailed': 'Couldn’t refresh providers',
+  'home.continueReading': 'Continue reading',
+
+  // Search
+  'search.trending': 'Trending',
+  'search.genres': 'Genres',
+  'search.yearFrom': 'From year',
+  'search.yearTo': 'To year',
+  'search.anyYear': 'Any year',
+  'search.minRating': 'Minimum rating',
+  'search.anyRating': 'Any rating',
+  'search.status': 'Status',
+  'search.statusAny': 'Any status',
+  'search.providers': 'Providers',
+  'search.allProviders': 'All providers',
+  'search.applyFilters': 'Apply filters',
+  'search.clearFilters': 'Clear filters',
+  'search.noCatalogTitle': 'No catalog yet',
+  'search.noCatalogBody':
+      'Add a provider in Settings → Providers to search its catalog.',
+  'search.resultsFor': 'Results for “{query}”',
+
+  // Manga
+  'manga.searchHint': 'Search manga & manhwa…',
+  'manga.emptyTitle': 'No manga or manhwa yet',
+  'manga.emptyBody':
+      'Add a provider with comics, or try a different filter.',
+  'manga.genreAll': 'All genres',
+  'manga.newChapters': 'New chapters',
+  'manga.browseAll': 'Browse all',
+
+  // Library
+  'library.continueEmpty': 'Nothing in progress',
+  'library.continueEmptyBody':
+      'Start a show or a chapter and it will show up here.',
+  'library.clearHistoryConfirm': 'Clear all watch history?',
+  'library.historyCleared': 'History cleared',
+
+  // Profile
+  'profile.providers': 'My providers',
+  'profile.developer': 'Developer',
+  'profile.developerName': 'Jarif Ahmed',
+  'profile.codeHint':
+      'Your device code is stored on this device. To see it, go to Settings → Backup & restore.',
+  'profile.viewCode': 'View code',
+  'profile.noProfile': 'No profile yet',
+  'profile.signOutFailed': 'Couldn’t sign out. Please try again.',
+
+  // Settings
+  'settings.notificationsNote':
+      'In-app notifications only — no push notifications in this build.',
+  'settings.developer': 'Developer',
+  'settings.developerName': 'Jarif Ahmed',
+  'settings.aboutBody':
+      'StreamBox brings anime, movies, manga and manhwa from your own JSON provider catalogs into one place. All of your data stays on this device — there is no server account.',
+  'settings.aboutVersion': 'Version 0.1.0',
+
+  // Details
+  'details.notFoundTitle': 'Title not found',
+  'details.notFoundBody':
+      'This title may have been removed, or its provider is disabled.',
+  'details.moreLikeThis': 'More like this',
+  'details.noEpisodes': 'No episodes listed for this title.',
+  'details.noChapters': 'No chapters listed for this title.',
+  'details.shareText': 'Check out {title} on StreamBox',
+  'details.noVideo': 'No video available for this title.',
+  'details.noPages': 'No pages available for this title.',
+  'details.resumeEpisode': 'Resume episode {number}',
+  'details.resumeChapter': 'Resume chapter {number}',
+  'details.statusUnknown': 'Unknown',
+  'details.pagesCount': '{count} pages',
+};

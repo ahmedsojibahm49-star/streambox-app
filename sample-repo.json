@@ -1,0 +1,852 @@
+{
+  "name": "Sample Catalog",
+  "version": 1,
+  "items": [
+    {
+      "id": "last-horizon",
+      "type": "anime",
+      "title": "Last Horizon",
+      "posterUrl": "assets/artwork/last-horizon-poster.jpg",
+      "backdropUrl": "assets/artwork/hero-last-horizon.jpg",
+      "year": 2025,
+      "rating": 8.9,
+      "genres": [
+        "Sci-Fi",
+        "Adventure"
+      ],
+      "overview": "A cartographer on the last survey ship maps a sea that redraws itself every night — and finds an island that should not exist.",
+      "status": "ongoing",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "The Sea That Moves",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "Cartography of Ghosts",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "The Thirteenth Island",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "neon-frontier",
+      "type": "anime",
+      "title": "Neon Frontier",
+      "posterUrl": "assets/artwork/neon-frontier-poster.jpg",
+      "backdropUrl": "assets/artwork/neon-frontier-skyline-wide.jpg",
+      "year": 2024,
+      "rating": 8.7,
+      "genres": [
+        "Cyberpunk",
+        "Action"
+      ],
+      "overview": "In a city where memories are currency, a courier who cannot forget takes one last job across the neon divide.",
+      "status": "ongoing",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Memory Is Currency",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Courier",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Across the Divide",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "echoes-tomorrow",
+      "type": "anime",
+      "title": "Echoes of Tomorrow",
+      "posterUrl": "assets/artwork/poster-echoes-tomorrow.jpg",
+      "backdropUrl": "assets/artwork/echoes-tomorrow-wide.jpg",
+      "year": 2025,
+      "rating": 9.1,
+      "genres": [
+        "Drama",
+        "Sci-Fi"
+      ],
+      "overview": "Every morning, Mira wakes to voicemails from a future version of herself. Today, the messages stop.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Voicemails from Tomorrow",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Silent Morning",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Answer the Future",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "foxglove-academy",
+      "type": "anime",
+      "title": "Foxglove Academy",
+      "posterUrl": "assets/artwork/paper-moons-poster.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2024,
+      "rating": 8.2,
+      "genres": [
+        "School",
+        "Fantasy"
+      ],
+      "overview": "A school for young hedge-witches where the final exam is keeping the school itself from wandering off.",
+      "status": "ongoing",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Orientation Day",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Wandering Library",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Final Exam",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "hollow-signal",
+      "type": "anime",
+      "title": "Hollow Signal",
+      "posterUrl": "assets/artwork/glass-detective-poster.jpg",
+      "backdropUrl": "assets/artwork/echoes-tomorrow-wide.jpg",
+      "year": 2026,
+      "rating": 8.5,
+      "genres": [
+        "Mystery",
+        "Thriller"
+      ],
+      "overview": "A late-night radio host starts receiving calls from a station that went off the air forty years ago.",
+      "status": "ongoing",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Frequency 87.4",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Caller",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Dead Air",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "static-bloom",
+      "type": "anime",
+      "title": "Static Bloom",
+      "posterUrl": "assets/artwork/silent-tide-poster.jpg",
+      "backdropUrl": "assets/artwork/neon-frontier-skyline-wide.jpg",
+      "year": 2023,
+      "rating": 7.9,
+      "genres": [
+        "Romance",
+        "Slice of Life"
+      ],
+      "overview": "Two rival florists share one tiny shop, one broken radio, and a summer neither of them planned.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "One Shop, Two Florists",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Broken Radio",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Summer Blooms",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "ninth-lantern",
+      "type": "anime",
+      "title": "The Ninth Lantern",
+      "posterUrl": "assets/artwork/solar-winds-poster.jpg",
+      "backdropUrl": "assets/artwork/hero-last-horizon.jpg",
+      "year": 2025,
+      "rating": 8.8,
+      "genres": [
+        "Fantasy",
+        "Adventure"
+      ],
+      "overview": "Eight lanterns light the mountain pass. A young keeper must relight the ninth — the one nobody admits exists.",
+      "status": "ongoing",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Keeper of the Pass",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 2,
+          "title": "The Lantern Nobody Sees",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 1420
+        },
+        {
+          "number": 3,
+          "title": "Light the Ninth",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 1420
+        }
+      ]
+    },
+    {
+      "id": "midnight-city",
+      "type": "movie",
+      "title": "Midnight City",
+      "posterUrl": "assets/artwork/poster-midnight-city.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2025,
+      "rating": 8.4,
+      "genres": [
+        "Noir",
+        "Crime"
+      ],
+      "overview": "One night, one taxi, and a driver who knows every secret the city tries to keep after midnight.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 6240
+        }
+      ]
+    },
+    {
+      "id": "glass-detective",
+      "type": "movie",
+      "title": "Glass Detective",
+      "posterUrl": "assets/artwork/glass-detective-poster.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2024,
+      "rating": 8.6,
+      "genres": [
+        "Mystery",
+        "Thriller"
+      ],
+      "overview": "A detective who reads crimes from broken glass takes a case where every mirror in the house is intact — except one.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 7020
+        }
+      ]
+    },
+    {
+      "id": "northern-lights",
+      "type": "movie",
+      "title": "Northern Lights",
+      "posterUrl": "assets/artwork/northern-lights-poster.jpg",
+      "backdropUrl": "assets/artwork/echoes-tomorrow-wide.jpg",
+      "year": 2026,
+      "rating": 9.0,
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
+      "overview": "Two strangers chase the aurora across a frozen north, carrying letters neither of them wrote.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 6480
+        }
+      ]
+    },
+    {
+      "id": "solar-winds",
+      "type": "movie",
+      "title": "Solar Winds",
+      "posterUrl": "assets/artwork/solar-winds-poster.jpg",
+      "backdropUrl": "assets/artwork/neon-frontier-skyline-wide.jpg",
+      "year": 2023,
+      "rating": 7.8,
+      "genres": [
+        "Sci-Fi",
+        "Adventure"
+      ],
+      "overview": "A solar-sail race around the sun, where the fastest ship is crewed by the slowest family in the fleet.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          "durationSeconds": 5940
+        }
+      ]
+    },
+    {
+      "id": "crimson-harbor",
+      "type": "movie",
+      "title": "Crimson Harbor",
+      "posterUrl": "assets/artwork/wild-ember-poster.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2025,
+      "rating": 8.1,
+      "genres": [
+        "Drama",
+        "Mystery"
+      ],
+      "overview": "A harbor town paints its boats crimson once a year. This year, one boat returns that never left.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          "durationSeconds": 6660
+        }
+      ]
+    },
+    {
+      "id": "velvet-thunder",
+      "type": "movie",
+      "title": "Velvet Thunder",
+      "posterUrl": "assets/artwork/neon-frontier-poster.jpg",
+      "backdropUrl": "assets/artwork/player-last-horizon.jpg",
+      "year": 2024,
+      "rating": 7.6,
+      "genres": [
+        "Action",
+        "Music"
+      ],
+      "overview": "A retired stunt drummer is pulled back for one last heist — timed to a song only she can hear.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          "durationSeconds": 5760
+        }
+      ]
+    },
+    {
+      "id": "moonlit-foundry",
+      "type": "movie",
+      "title": "Moonlit Foundry",
+      "posterUrl": "assets/artwork/last-horizon-poster.jpg",
+      "backdropUrl": "assets/artwork/hero-last-horizon.jpg",
+      "year": 2026,
+      "rating": 8.3,
+      "genres": [
+        "Fantasy",
+        "Family"
+      ],
+      "overview": "A blacksmith who forges tools from moonlight must make one last key before the moon goes dark for a hundred years.",
+      "status": "completed",
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Full movie",
+          "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          "durationSeconds": 6120
+        }
+      ]
+    },
+    {
+      "id": "paper-moons",
+      "type": "manga",
+      "title": "Paper Moons",
+      "posterUrl": "assets/artwork/paper-moons-poster.jpg",
+      "backdropUrl": "assets/artwork/echoes-tomorrow-wide.jpg",
+      "year": 2022,
+      "rating": 8.7,
+      "genres": [
+        "Romance",
+        "Drama"
+      ],
+      "overview": "A paper artist folds a moon for the girl across the street every month — and one month, she folds one back.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The First Fold",
+          "pageUrls": [
+            "https://picsum.photos/seed/paper-moons-1-1/800/1200",
+            "https://picsum.photos/seed/paper-moons-1-2/800/1200",
+            "https://picsum.photos/seed/paper-moons-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Waxing",
+          "pageUrls": [
+            "https://picsum.photos/seed/paper-moons-2-1/800/1200",
+            "https://picsum.photos/seed/paper-moons-2-2/800/1200",
+            "https://picsum.photos/seed/paper-moons-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "A Moon in Return",
+          "pageUrls": [
+            "https://picsum.photos/seed/paper-moons-3-1/800/1200",
+            "https://picsum.photos/seed/paper-moons-3-2/800/1200",
+            "https://picsum.photos/seed/paper-moons-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iron-blossom",
+      "type": "manga",
+      "title": "Iron Blossom",
+      "posterUrl": "assets/artwork/wild-ember-poster.jpg",
+      "backdropUrl": "assets/artwork/neon-frontier-skyline-wide.jpg",
+      "year": 2023,
+      "rating": 8.9,
+      "genres": [
+        "Action",
+        "Samurai"
+      ],
+      "overview": "A retired swordsmith picks up the blade one last time to protect the apprentice who surpassed her.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Retired Blade",
+          "pageUrls": [
+            "https://picsum.photos/seed/iron-blossom-1-1/800/1200",
+            "https://picsum.photos/seed/iron-blossom-1-2/800/1200",
+            "https://picsum.photos/seed/iron-blossom-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "The Apprentice",
+          "pageUrls": [
+            "https://picsum.photos/seed/iron-blossom-2-1/800/1200",
+            "https://picsum.photos/seed/iron-blossom-2-2/800/1200",
+            "https://picsum.photos/seed/iron-blossom-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "One Last Cut",
+          "pageUrls": [
+            "https://picsum.photos/seed/iron-blossom-3-1/800/1200",
+            "https://picsum.photos/seed/iron-blossom-3-2/800/1200",
+            "https://picsum.photos/seed/iron-blossom-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cartographers-daughter",
+      "type": "manga",
+      "title": "The Cartographer's Daughter",
+      "posterUrl": "assets/artwork/northern-lights-poster.jpg",
+      "backdropUrl": "assets/artwork/hero-last-horizon.jpg",
+      "year": 2024,
+      "rating": 9.2,
+      "genres": [
+        "Adventure",
+        "Fantasy"
+      ],
+      "overview": "Inheriting her father's unfinished atlas, a girl sets out to map the blank quarter — where the map itself fights back.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Unfinished Atlas",
+          "pageUrls": [
+            "https://picsum.photos/seed/cartographer-1-1/800/1200",
+            "https://picsum.photos/seed/cartographer-1-2/800/1200",
+            "https://picsum.photos/seed/cartographer-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "The Blank Quarter",
+          "pageUrls": [
+            "https://picsum.photos/seed/cartographer-2-1/800/1200",
+            "https://picsum.photos/seed/cartographer-2-2/800/1200",
+            "https://picsum.photos/seed/cartographer-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Map Fights Back",
+          "pageUrls": [
+            "https://picsum.photos/seed/cartographer-3-1/800/1200",
+            "https://picsum.photos/seed/cartographer-3-2/800/1200",
+            "https://picsum.photos/seed/cartographer-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rust-stardust",
+      "type": "manga",
+      "title": "Rust & Stardust",
+      "posterUrl": "assets/artwork/solar-winds-poster.jpg",
+      "backdropUrl": "assets/artwork/player-last-horizon.jpg",
+      "year": 2021,
+      "rating": 8.0,
+      "genres": [
+        "Sci-Fi",
+        "Mecha"
+      ],
+      "overview": "A junkyard mechanic rebuilds a fallen star-soldier from scrap — and the soldier remembers the war differently.",
+      "status": "completed",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Scrapyard",
+          "pageUrls": [
+            "https://picsum.photos/seed/rust-stardust-1-1/800/1200",
+            "https://picsum.photos/seed/rust-stardust-1-2/800/1200",
+            "https://picsum.photos/seed/rust-stardust-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "The Fallen Soldier",
+          "pageUrls": [
+            "https://picsum.photos/seed/rust-stardust-2-1/800/1200",
+            "https://picsum.photos/seed/rust-stardust-2-2/800/1200",
+            "https://picsum.photos/seed/rust-stardust-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "A Different War",
+          "pageUrls": [
+            "https://picsum.photos/seed/rust-stardust-3-1/800/1200",
+            "https://picsum.photos/seed/rust-stardust-3-2/800/1200",
+            "https://picsum.photos/seed/rust-stardust-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "emberline-express",
+      "type": "manga",
+      "title": "Emberline Express",
+      "posterUrl": "assets/artwork/poster-midnight-city.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2025,
+      "rating": 8.4,
+      "genres": [
+        "Mystery",
+        "Supernatural"
+      ],
+      "overview": "A night train that only stops for passengers who are already gone. Its new conductor is very much alive — for now.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Night Train",
+          "pageUrls": [
+            "https://picsum.photos/seed/emberline-1-1/800/1200",
+            "https://picsum.photos/seed/emberline-1-2/800/1200",
+            "https://picsum.photos/seed/emberline-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Passengers Who Are Gone",
+          "pageUrls": [
+            "https://picsum.photos/seed/emberline-2-1/800/1200",
+            "https://picsum.photos/seed/emberline-2-2/800/1200",
+            "https://picsum.photos/seed/emberline-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Living Conductor",
+          "pageUrls": [
+            "https://picsum.photos/seed/emberline-3-1/800/1200",
+            "https://picsum.photos/seed/emberline-3-2/800/1200",
+            "https://picsum.photos/seed/emberline-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "silent-tide",
+      "type": "manhwa",
+      "title": "Silent Tide",
+      "posterUrl": "assets/artwork/silent-tide-poster.jpg",
+      "backdropUrl": "assets/artwork/echoes-tomorrow-wide.jpg",
+      "year": 2023,
+      "rating": 8.8,
+      "genres": [
+        "Fantasy",
+        "Romance"
+      ],
+      "overview": "A tide-witch who lost her voice bargains with the sea: one song, one storm, one love she cannot speak.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Voiceless Witch",
+          "pageUrls": [
+            "https://picsum.photos/seed/silent-tide-1-1/800/1200",
+            "https://picsum.photos/seed/silent-tide-1-2/800/1200",
+            "https://picsum.photos/seed/silent-tide-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Bargain with the Sea",
+          "pageUrls": [
+            "https://picsum.photos/seed/silent-tide-2-1/800/1200",
+            "https://picsum.photos/seed/silent-tide-2-2/800/1200",
+            "https://picsum.photos/seed/silent-tide-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "One Song, One Storm",
+          "pageUrls": [
+            "https://picsum.photos/seed/silent-tide-3-1/800/1200",
+            "https://picsum.photos/seed/silent-tide-3-2/800/1200",
+            "https://picsum.photos/seed/silent-tide-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wild-ember",
+      "type": "manhwa",
+      "title": "Wild Ember",
+      "posterUrl": "assets/artwork/wild-ember-poster.jpg",
+      "backdropUrl": "assets/artwork/neon-frontier-skyline-wide.jpg",
+      "year": 2024,
+      "rating": 8.5,
+      "genres": [
+        "Action",
+        "Fantasy"
+      ],
+      "overview": "The last ember-keeper flees a kingdom that outlawed fire — carrying the only flame that can never go out.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Last Flame",
+          "pageUrls": [
+            "https://picsum.photos/seed/wild-ember-1-1/800/1200",
+            "https://picsum.photos/seed/wild-ember-1-2/800/1200",
+            "https://picsum.photos/seed/wild-ember-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "A Kingdom Without Fire",
+          "pageUrls": [
+            "https://picsum.photos/seed/wild-ember-2-1/800/1200",
+            "https://picsum.photos/seed/wild-ember-2-2/800/1200",
+            "https://picsum.photos/seed/wild-ember-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Ember That Never Dies",
+          "pageUrls": [
+            "https://picsum.photos/seed/wild-ember-3-1/800/1200",
+            "https://picsum.photos/seed/wild-ember-3-2/800/1200",
+            "https://picsum.photos/seed/wild-ember-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "salted-crown",
+      "type": "manhwa",
+      "title": "The Salted Crown",
+      "posterUrl": "assets/artwork/glass-detective-poster.jpg",
+      "backdropUrl": "assets/artwork/hero-last-horizon.jpg",
+      "year": 2025,
+      "rating": 9.0,
+      "genres": [
+        "Drama",
+        "Political"
+      ],
+      "overview": "A salt merchant inherits a drowned throne and must rule a court that drowned with it.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Drowned Throne",
+          "pageUrls": [
+            "https://picsum.photos/seed/salted-crown-1-1/800/1200",
+            "https://picsum.photos/seed/salted-crown-1-2/800/1200",
+            "https://picsum.photos/seed/salted-crown-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "A Court Underwater",
+          "pageUrls": [
+            "https://picsum.photos/seed/salted-crown-2-1/800/1200",
+            "https://picsum.photos/seed/salted-crown-2-2/800/1200",
+            "https://picsum.photos/seed/salted-crown-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Merchant Queen",
+          "pageUrls": [
+            "https://picsum.photos/seed/salted-crown-3-1/800/1200",
+            "https://picsum.photos/seed/salted-crown-3-2/800/1200",
+            "https://picsum.photos/seed/salted-crown-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clockwork-garden",
+      "type": "manhwa",
+      "title": "Clockwork Garden",
+      "posterUrl": "assets/artwork/poster-echoes-tomorrow.jpg",
+      "backdropUrl": "assets/artwork/player-last-horizon.jpg",
+      "year": 2022,
+      "rating": 8.3,
+      "genres": [
+        "Steampunk",
+        "Mystery"
+      ],
+      "overview": "A gardener tends mechanical flowers that bloom only for liars — and someone in the manor is lying about a murder.",
+      "status": "completed",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Flowers for Liars",
+          "pageUrls": [
+            "https://picsum.photos/seed/clockwork-1-1/800/1200",
+            "https://picsum.photos/seed/clockwork-1-2/800/1200",
+            "https://picsum.photos/seed/clockwork-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "The Manor",
+          "pageUrls": [
+            "https://picsum.photos/seed/clockwork-2-1/800/1200",
+            "https://picsum.photos/seed/clockwork-2-2/800/1200",
+            "https://picsum.photos/seed/clockwork-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Last Bloom",
+          "pageUrls": [
+            "https://picsum.photos/seed/clockwork-3-1/800/1200",
+            "https://picsum.photos/seed/clockwork-3-2/800/1200",
+            "https://picsum.photos/seed/clockwork-3-3/800/1200"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gilded-tide",
+      "type": "manhwa",
+      "title": "The Gilded Tide",
+      "posterUrl": "assets/artwork/northern-lights-poster.jpg",
+      "backdropUrl": "assets/artwork/midnight-city-wide.jpg",
+      "year": 2026,
+      "rating": 8.6,
+      "genres": [
+        "Adventure",
+        "Pirates"
+      ],
+      "overview": "A pirate crew sails a sea of liquid gold, chasing the one island the tide refuses to return.",
+      "status": "ongoing",
+      "chapters": [
+        {
+          "number": 1,
+          "title": "A Sea of Gold",
+          "pageUrls": [
+            "https://picsum.photos/seed/gilded-tide-1-1/800/1200",
+            "https://picsum.photos/seed/gilded-tide-1-2/800/1200",
+            "https://picsum.photos/seed/gilded-tide-1-3/800/1200"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "The Island That Waits",
+          "pageUrls": [
+            "https://picsum.photos/seed/gilded-tide-2-1/800/1200",
+            "https://picsum.photos/seed/gilded-tide-2-2/800/1200",
+            "https://picsum.photos/seed/gilded-tide-2-3/800/1200"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Ride the Tide",
+          "pageUrls": [
+            "https://picsum.photos/seed/gilded-tide-3-1/800/1200",
+            "https://picsum.photos/seed/gilded-tide-3-2/800/1200",
+            "https://picsum.photos/seed/gilded-tide-3-3/800/1200"
+          ]
+        }
+      ]
+    }
+  ]
+}

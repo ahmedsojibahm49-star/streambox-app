@@ -1,0 +1,427 @@
+/// Bangla strings. MUST mirror en.dart key-for-key — every key in en.dart
+/// appears here with the same spelling. See the i18n key-adding rule in
+/// CONTRACT.md.
+const Map<String, String> bnStrings = {
+  // Common
+  'common.appName': 'StreamBox',
+  'common.ok': 'ঠিক আছে',
+  'common.cancel': 'বাতিল',
+  'common.retry': 'আবার চেষ্টা করুন',
+  'common.loading': 'লোড হচ্ছে…',
+  'common.error': 'কিছু একটা ভুল হয়েছে',
+  'common.errorGeneric': 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।',
+  'common.search': 'খুঁজুন',
+  'common.seeAll': 'সব দেখুন',
+  'common.save': 'সংরক্ষণ',
+  'common.delete': 'মুছুন',
+  'common.share': 'শেয়ার',
+  'common.download': 'ডাউনলোড',
+  'common.play': 'চালান',
+  'common.back': 'পেছনে',
+  'common.done': 'সম্পন্ন',
+  'common.next': 'পরবর্তী',
+  'common.skip': 'এড়িয়ে যান',
+  'common.getStarted': 'শুরু করুন',
+  'common.close': 'বন্ধ করুন',
+  'common.edit': 'সম্পাদনা',
+  'common.remove': 'সরান',
+  'common.add': 'যোগ করুন',
+  'common.confirm': 'নিশ্চিত করুন',
+  'common.yes': 'হ্যাঁ',
+  'common.no': 'না',
+  'common.comingSoon': 'শীঘ্রই আসছে',
+  'common.tryAgain': 'আবার চেষ্টা করুন',
+  'common.episodes': 'পর্ব',
+  'common.chapters': 'অধ্যায়',
+
+  // Validation
+  'validation.required': 'এই ঘরটি পূরণ করা আবশ্যক',
+  'validation.emailInvalid': 'সঠিক ইমেইল ঠিকানা দিন',
+  'validation.passwordShort': 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে',
+  'validation.nameShort': 'নামটি খুব ছোট',
+  'validation.nameLong': 'নামটি খুব বড়',
+  'validation.urlInvalid': 'সঠিক http(s) URL দিন',
+  'validation.urlNotJson': 'প্রোভাইডার URL .json দিয়ে শেষ হতে হবে',
+
+  // Auth
+  'auth.welcomeTitle': 'আপনার শো, আপনার মতো করে',
+  'auth.welcomeSubtitle':
+      'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — আপনার নিজের প্রোভাইডার থেকে, এক জায়গায়, অফলাইন-ফার্স্ট।',
+  'auth.login': 'লগ ইন',
+  'auth.signup': 'সাইন আপ',
+  'auth.logout': 'লগ আউট',
+  'auth.email': 'ইমেইল',
+  'auth.password': 'পাসওয়ার্ড',
+  'auth.name': 'নাম',
+  'auth.nameHint': 'আপনার নাম',
+  'auth.emailHint': 'you@example.com',
+  'auth.passwordHint': 'কমপক্ষে ৮ অক্ষর',
+  'auth.noAccount': 'অ্যাকাউন্ট নেই?',
+  'auth.haveAccount': 'ইতিমধ্যে অ্যাকাউন্ট আছে?',
+  'auth.createAccount': 'অ্যাকাউন্ট তৈরি করুন',
+  'auth.loginTitle': 'আবার স্বাগতম',
+  'auth.signupTitle': 'আপনার অ্যাকাউন্ট তৈরি করুন',
+  'auth.codeTitle': 'আপনার ডিভাইস কোড',
+  'auth.codeSubtitle':
+      'এই কোড দিয়ে এই ডিভাইসে আপনার অ্যাকাউন্ট খুলবে। নিরাপদে রাখুন — লগ ইন করতে এটি লাগবে।',
+  'auth.codeHint': 'SB-XXXX-XXXX-XXXX',
+  'auth.codeInvalid': 'কোডটি ঠিক মনে হচ্ছে না',
+  'auth.codeCopied': 'কোড কপি হয়েছে',
+  'auth.loginFailed': 'লগ ইন হয়নি। তথ্য যাচাই করে আবার চেষ্টা করুন।',
+  'auth.signupFailed': 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।',
+  'auth.continueWithCode': 'কোড দিয়ে এগিয়ে যান',
+  'auth.yourCode': 'আপনার কোড',
+  'auth.saveYourCode': 'এই কোডটি নিরাপদ জায়গায় সংরক্ষণ করুন',
+  'auth.codeWarning':
+      'এই কোড ছাড়া নতুন ডিভাইসে লগ ইন বা ব্যাকআপ ফেরানো যাবে না।',
+  'auth.deviceCode': 'ডিভাইস কোড',
+  'auth.loginSuccess': 'লগ ইন সম্পন্ন — আবার স্বাগতম!',
+  'auth.accountCreated': 'অ্যাকাউন্ট তৈরি হয়েছে!',
+  'auth.errorWrongEmail': 'এই ইমেইল ঠিকানায় কোনো অ্যাকাউন্ট নেই।',
+  'auth.errorWrongPassword': 'পাসওয়ার্ডটি মিলছে না।',
+  'auth.errorWrongCode': 'ডিভাইস কোডটি ভুল।',
+  'auth.errorAccountExists':
+      'এই ডিভাইসে ইতিমধ্যে একটি অ্যাকাউন্ট আছে। লগ ইন করুন।',
+  'auth.iSavedMyCode': 'আমি কোডটি সংরক্ষণ করেছি',
+  'auth.forgotCodeHint':
+      'আপনার কোডটি সাইন আপের সময় একবারই দেখানো হয়েছিল। যেখানে সংরক্ষণ করেছিলেন, সেখানে দেখুন — এটি ছাড়া লগ ইন বা ব্যাকআপ ফেরানো যাবে না।',
+  'auth.showPassword': 'পাসওয়ার্ড দেখুন',
+  'auth.hidePassword': 'পাসওয়ার্ড লুকান',
+  'auth.signupSubtitle':
+      'আপনার অ্যাকাউন্ট শুধু এই ডিভাইসেই থাকে — কোনো সার্ভার নেই, কোনো ট্র্যাকিং নেই।',
+  'auth.loginSubtitle': 'এগিয়ে যেতে ইমেইল, পাসওয়ার্ড ও ডিভাইস কোড দিন।',
+  'auth.loginSuccessBody': '{name} হিসেবে সাইন ইন হয়েছে।',
+  'auth.checkingSession': 'সেশন যাচাই হচ্ছে…',
+  'auth.deleteAccount': 'অ্যাকাউন্ট মুছুন',
+  'auth.deleteAccountConfirm':
+      'এই ডিভাইস থেকে আপনার অ্যাকাউন্ট ও সব ডেটা মুছে ফেলবেন? আপনার লাইব্রেরি, ইতিহাস ও প্রোফাইল চিরতরে মুছে যাবে।',
+  'auth.accountDeleted': 'অ্যাকাউন্ট মুছে ফেলা হয়েছে।',
+  'auth.creatingAccount': 'অ্যাকাউন্ট তৈরি হচ্ছে…',
+  'auth.loggingIn': 'লগ ইন হচ্ছে…',
+  'auth.tapToContinue': 'এগিয়ে যেতে যেকোনো জায়গায় ট্যাপ করুন',
+
+  // Onboarding
+  'onboarding.slide1Title': 'যা ভালোবাসেন, সব এক অ্যাপে',
+  'onboarding.slide1Body':
+      'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — অ্যাপ না বদলে দেখুন ও পড়ুন।',
+  'onboarding.slide2Title': 'আপনার প্রোভাইডার, আপনার ক্যাটালগ',
+  'onboarding.slide2Body':
+      'JSON ক্যাটালগ রেপো যোগ করুন ও একসাথে ব্রাউজ করুন। কোনো সার্ভারে অ্যাকাউন্ট নেই।',
+  'onboarding.slide3Title': 'গোপনীয়তা প্রথমে',
+  'onboarding.slide3Body':
+      'আপনার লাইব্রেরি, ইতিহাস ও ব্যাকআপ আপনার ডিভাইসেই থাকে। চাবি আপনার হাতে।',
+
+  // Home
+  'home.title': 'হোম',
+  'home.greeting': 'শুভ সন্ধ্যা',
+  'home.continueWatching': 'দেখা চালিয়ে যান',
+  'home.trendingNow': 'এখন ট্রেন্ডিং',
+  'home.topRated': 'সেরা রেটিং',
+  'home.newReleases': 'নতুন রিলিজ',
+  'home.recommended': 'আপনার জন্য সুপারিশ',
+  'home.myList': 'আমার তালিকা',
+  'home.becauseYouWatched': 'আপনি দেখেছেন বলে',
+  'home.emptyTitle': 'এখানে এখনো কিছু নেই',
+  'home.emptyBody':
+      'হোম স্ক্রিন ভরতে সেটিংস থেকে একটি প্রোভাইডার যোগ করুন।',
+
+  // Search
+  'search.title': 'খুঁজুন',
+  'search.hint': 'অ্যানিমে, মুভি, মাঙ্গা খুঁজুন…',
+  'search.filters': 'ফিল্টার',
+  'search.sortBy': 'সাজান',
+  'search.sortRelevance': 'প্রাসঙ্গিকতা',
+  'search.sortRating': 'রেটিং',
+  'search.sortYear': 'বছর',
+  'search.sortAZ': 'অ–হ',
+  'search.resultsCount': '{count}টি ফলাফল',
+  'search.noResultsTitle': 'কোনো ফলাফল পাওয়া যায়নি',
+  'search.noResultsBody': 'অন্য নাম দিয়ে চেষ্টা করুন, বা বানান যাচাই করুন।',
+  'search.recent': 'সাম্প্রতিক খোঁজ',
+  'search.clearAll': 'সব মুছুন',
+  'search.allTypes': 'সব ধরন',
+  'search.typeAnime': 'অ্যানিমে',
+  'search.typeMovie': 'মুভি',
+  'search.typeManga': 'মাঙ্গা',
+  'search.typeManhwa': 'মানহোয়া',
+
+  // Manga
+  'manga.title': 'মাঙ্গা ও মানহোয়া',
+  'manga.tab': 'মাঙ্গা',
+  'manga.all': 'সব কমিক',
+  'manga.popular': 'জনপ্রিয়',
+  'manga.latestChapters': 'সর্বশেষ অধ্যায়',
+  'manga.readNow': 'এখনই পড়ুন',
+  'manga.continueReading': 'পড়া চালিয়ে যান',
+  'manga.chaptersCount': '{count}টি অধ্যায়',
+
+  // Library
+  'library.title': 'লাইব্রেরি',
+  'library.myListEmpty': 'আপনার তালিকা খালি',
+  'library.myListEmptyBody': 'যেকোনো টাইটেলে বুকমার্ক ট্যাপ করে এখানে সংরক্ষণ করুন।',
+  'library.favoritesEmpty': 'এখনো কোনো প্রিয় নেই',
+  'library.favoritesEmptyBody': 'যেকোনো টাইটেলে হার্ট ট্যাপ করে প্রিয় করুন।',
+  'library.historyEmpty': 'এখনো কোনো ইতিহাস নেই',
+  'library.historyEmptyBody': 'আপনি যা দেখবেন ও পড়বেন, তা এখানে আসবে।',
+  'library.favorites': 'প্রিয়',
+  'library.history': 'ইতিহাস',
+  'library.clearHistory': 'ইতিহাস মুছুন',
+  'library.addedToList': 'আমার তালিকায় যোগ হয়েছে',
+  'library.removedFromList': 'আমার তালিকা থেকে সরানো হয়েছে',
+  'library.addedToFavorites': 'প্রিয়তে যোগ হয়েছে',
+  'library.removedFromFavorites': 'প্রিয় থেকে সরানো হয়েছে',
+
+  // Profile
+  'profile.title': 'প্রোফাইল',
+  'profile.editProfile': 'প্রোফাইল সম্পাদনা',
+  'profile.myStats': 'আমার পরিসংখ্যান',
+  'profile.watched': 'দেখা হয়েছে',
+  'profile.read': 'অধ্যায় পড়া হয়েছে',
+  'profile.saved': 'সংরক্ষিত',
+  'profile.memberSince': 'সদস্য যেদিন থেকে',
+  'profile.about': 'সম্পর্কে',
+
+  // Settings
+  'settings.title': 'সেটিংস',
+  'settings.appearance': 'চেহারা',
+  'settings.theme': 'থিম',
+  'settings.themeSystem': 'সিস্টেম',
+  'settings.themeDark': 'ডার্ক',
+  'settings.themeLight': 'লাইট',
+  'settings.language': 'ভাষা',
+  'settings.languageEnglish': 'English',
+  'settings.languageBangla': 'বাংলা',
+  'settings.notifications': 'নোটিফিকেশন',
+  'settings.notificationsDesc': 'আপনার প্রোভাইডার থেকে নতুন পর্ব ও অধ্যায়',
+  'settings.providers': 'প্রোভাইডার',
+  'settings.backup': 'ব্যাকআপ ও পুনরুদ্ধার',
+  'settings.aboutApp': 'StreamBox সম্পর্কে',
+  'settings.version': 'সংস্করণ',
+  'settings.signOut': 'সাইন আউট',
+  'settings.signOutConfirm': 'এই ডিভাইস থেকে সাইন আউট করবেন?',
+  'settings.account': 'অ্যাকাউন্ট',
+
+  // Providers
+  'providers.title': 'প্রোভাইডার',
+  'providers.subtitle':
+      'প্রোভাইডার হলো JSON ক্যাটালগ। রেপো URL যোগ করে এর অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া ব্রাউজ করুন।',
+  'providers.addProvider': 'প্রোভাইডার যোগ করুন',
+  'providers.providerName': 'প্রোভাইডারের নাম',
+  'providers.providerUrl': 'রেপো JSON URL',
+  'providers.providerUrlHint': 'https://example.com/catalog.json',
+  'providers.builtIn': 'বিল্ট-ইন',
+  'providers.enabled': 'চালু',
+  'providers.disabled': 'বন্ধ',
+  'providers.lastFetched': 'সর্বশেষ আপডেট',
+  'providers.itemCount': '{count}টি আইটেম',
+  'providers.removeProvider': 'প্রোভাইডার সরান',
+  'providers.providerAdded': 'প্রোভাইডার যোগ হয়েছে',
+  'providers.providerInvalid': 'ক্যাটালগটি পড়া যায়নি। URL যাচাই করুন।',
+  'providers.refreshAll': 'সব রিফ্রেশ করুন',
+  'providers.sampleCatalog': 'নমুনা ক্যাটালগ',
+  'providers.addRepo': 'রেপো যোগ করুন',
+  'providers.addViaUrl': 'URL দিয়ে যোগ করুন',
+  'providers.addViaJson': 'JSON পেস্ট করুন',
+  'providers.pasteJsonLabel': 'রেপো JSON',
+  'providers.pasteJsonHint': 'রেপো JSON এখানে পেস্ট করুন…',
+  'providers.loadExample': 'উদাহরণ লোড করুন',
+  'providers.exampleLoaded': 'উদাহরণ JSON লোড হয়েছে',
+  'providers.refresh': 'রিফ্রেশ',
+  'providers.removeConfirm': '“{name}” এবং এর {count}টি আইটেম সরাবেন?',
+  'providers.providerRemoved': 'প্রোভাইডার সরানো হয়েছে',
+  'providers.providerRefreshed': 'প্রোভাইডার রিফ্রেশ হয়েছে',
+  'providers.refreshFailed': 'রিফ্রেশ হয়নি',
+  'providers.noAddedRepos': 'এখনো কোনো প্রোভাইডার যোগ হয়নি',
+  'providers.noAddedReposBody':
+      'নমুনার পাশাপাশি আরেকটি ক্যাটালগ ব্রাউজ করতে রেপো URL যোগ করুন বা JSON পেস্ট করুন।',
+  'providers.neverFetched': 'কখনো আপডেট হয়নি',
+  'providers.cantDeleteBuiltIn':
+      'বিল্ট-ইন ক্যাটালগ সরানো যাবে না, তবে বন্ধ করা যাবে।',
+  'providers.adding': 'প্রোভাইডার যোগ হচ্ছে…',
+  'providers.refreshing': 'রিফ্রেশ হচ্ছে…',
+  'providers.invalidJson': 'JSON-টি পড়া যায়নি। যাচাই করে আবার চেষ্টা করুন।',
+
+  // Player
+  'player.episode': 'পর্ব {number}',
+  'player.nextEpisode': 'পরের পর্ব',
+  'player.previousEpisode': 'আগের পর্ব',
+  'player.playbackSpeed': 'গতি',
+  'player.quality': 'কোয়ালিটি',
+  'player.nowPlaying': 'এখন চলছে',
+  'player.upNext': 'এরপর',
+  'player.resumeFrom': '{time} থেকে চালিয়ে যান',
+  'player.markWatched': 'দেখা হয়েছে চিহ্নিত করুন',
+  'player.noVideo': 'এই পর্বের কোনো ভিডিও নেই।',
+  'player.itemNotFound':
+      'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
+  'player.videoFailed':
+      'এই ভিডিওটি চালানো যাচ্ছে না। সংযোগ যাচাই করুন বা অন্য পর্ব চেষ্টা করুন।',
+  'player.skipBack10': '১০ সেকেন্ড পেছনে',
+  'player.skipForward10': '১০ সেকেন্ড এগিয়ে',
+  'player.fullscreen': 'ফুলস্ক্রিন',
+  'player.exitFullscreen': 'ফুলস্ক্রিন থেকে বের হন',
+  'player.openInBrowser': 'ব্রাউজারে খুলুন',
+  'player.episodes': 'পর্বসমূহ',
+  'player.noMoreEpisodes': 'এটাই শেষ পর্ব ছিল।',
+  'player.replay': 'আবার চালান',
+
+  // Reader
+  'reader.chapter': 'অধ্যায় {number}',
+  'reader.page': 'পৃষ্ঠা {current} / {total}',
+  'reader.nextChapter': 'পরের অধ্যায়',
+  'reader.previousChapter': 'আগের অধ্যায়',
+  'reader.verticalScroll': 'উল্লম্ব স্ক্রল',
+  'reader.pageTurn': 'পৃষ্ঠা ধরে ধরে',
+  'reader.noPages': 'এই অধ্যায়ের কোনো পৃষ্ঠা নেই।',
+  'reader.settings': 'রিডার সেটিংস',
+  'reader.readingMode': 'পড়ার ধরন',
+  'reader.brightness': 'উজ্জ্বলতা',
+  'reader.chapters': 'অধ্যায়সমূহ',
+  'reader.pagesCount': '{count} পৃষ্ঠা',
+  'reader.itemNotFound':
+      'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
+  'reader.failedToLoadPage': 'এই পৃষ্ঠাটি লোড করা যায়নি।',
+
+  // Backup
+  'backup.title': 'ব্যাকআপ ও পুনরুদ্ধার',
+  'backup.subtitle':
+      'আপনার লাইব্রেরি, ইতিহাস ও সেটিংসের এনক্রিপ্টেড ব্যাকআপ নিন। আপনার ডিভাইস কোড দিয়ে এটি খুলবে।',
+  'backup.export': 'ব্যাকআপ নিন',
+  'backup.import': 'ব্যাকআপ ফেরান',
+  'backup.exported': 'ব্যাকআপ নেওয়া হয়েছে',
+  'backup.imported': 'ব্যাকআপ ফেরানো হয়েছে',
+  'backup.failed': 'ব্যাকআপ হয়নি। আবার চেষ্টা করুন।',
+  'backup.warning':
+      'ব্যাকআপ ফাইল ও ডিভাইস কোড একসাথে রাখুন — একটি ছাড়া অন্যটি দিয়ে কিছু ফেরানো যাবে না।',
+  'backup.chooseFile': 'ব্যাকআপ ফাইল বেছে নিন',
+  'backup.noBackupFound': 'ফাইলটিতে কোনো ব্যাকআপ পাওয়া যায়নি।',
+  'backup.restoreConfirm': 'বর্তমান ডেটা মুছে এই ব্যাকআপ দিয়ে বদলাবেন?',
+  'backup.restoreConfirmBody':
+      'ইমপোর্ট করলে ব্যাকআপের ডেটা দিয়ে আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস ও প্রোভাইডার বদলে যাবে। এটি আর ফেরানো যাবে না।',
+  'backup.codePrompt': 'আপনার ডিভাইস কোড দিন',
+  'backup.codePromptBody':
+      'আপনার কোড এই ব্যাকআপটি লক করে। শুধু এই কোড দিয়েই এটি আবার খোলা যাবে।',
+  'backup.exportDesc':
+      'আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস, প্রোভাইডার ও সেটিংসের এনক্রিপ্টেড কপি .sbbackup ফাইলে সংরক্ষণ করুন।',
+  'backup.importDesc':
+      'আগে নেওয়া .sbbackup ফাইল থেকে সবকিছু ফেরান। বর্তমান ডেটা বদলে যাবে।',
+  'backup.codeAloneNote':
+      'কোনো সার্ভার নেই: শুধু কোড দিয়ে নতুন ডিভাইসে ডেটা আনা যাবে না। ব্যাকআপ ফাইলটিই বাহক — ফাইল ও কোড একসাথে রাখুন।',
+  'backup.wrongCode':
+      'এই কোড দিয়ে ব্যাকআপটি খোলা যায়নি। কোড যাচাই করুন, অথবা ফাইলটি নষ্ট হতে পারে।',
+  'backup.invalidFile': 'ফাইলটি StreamBox ব্যাকআপ বলে মনে হচ্ছে না।',
+  'backup.exportCancelled': 'এক্সপোর্ট বাতিল হয়েছে।',
+  'backup.exporting': 'ব্যাকআপ এনক্রিপ্ট হচ্ছে…',
+  'backup.restoring': 'ব্যাকআপ ফেরানো হচ্ছে…',
+  'backup.exportedTo': 'ব্যাকআপ {file} হিসেবে সংরক্ষিত হয়েছে।',
+  'backup.selectedFile': 'বেছে নেওয়া ফাইল',
+  'backup.signInAgain':
+      'ব্যাকআপ ফেরানো হয়েছে। ফেরানো অ্যাকাউন্ট দিয়ে আবার লগ ইন করুন।',
+  'backup.unlockBackup': 'ব্যাকআপ খুলুন',
+
+  // Details
+  'details.overview': 'সারসংক্ষেপ',
+  'details.genres': 'ধরন',
+  'details.year': 'বছর',
+  'details.rating': 'রেটিং',
+  'details.status': 'অবস্থা',
+  'details.ongoing': 'চলমান',
+  'details.completed': 'সম্পন্ন',
+  'details.watchNow': 'এখনই দেখুন',
+  'details.readNow': 'এখনই পড়ুন',
+  'details.addToList': 'আমার তালিকায় যোগ করুন',
+  'details.inList': 'আমার তালিকায় আছে',
+  'details.favorite': 'প্রিয়',
+  'details.episodesList': 'পর্বসমূহ',
+  'details.chaptersList': 'অধ্যায়সমূহ',
+
+  // --- Screens workstream additions --------------------------------------
+
+  // Common
+  'common.all': 'সব',
+
+  // Splash
+  'splash.tagline': 'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — আপনার মতো করে',
+
+  // Home
+  'home.greetingMorning': 'সুপ্রভাত',
+  'home.greetingAfternoon': 'শুভ অপরাহ্ন',
+  'home.greetingEvening': 'শুভ সন্ধ্যা',
+  'home.trendingAnime': 'জনপ্রিয় অ্যানিমে',
+  'home.moviesRow': 'মুভি',
+  'home.mangaRow': 'মাঙ্গা ও মানহোয়া',
+  'home.newChapters': 'নতুন অধ্যায়',
+  'home.addProvider': 'প্রোভাইডার যোগ করুন',
+  'home.details': 'বিস্তারিত',
+  'home.refreshFailed': 'প্রোভাইডার রিফ্রেশ করা যায়নি',
+  'home.continueReading': 'পড়া চালিয়ে যান',
+
+  // Search
+  'search.trending': 'জনপ্রিয়',
+  'search.genres': 'ধরন',
+  'search.yearFrom': 'শুরুর বছর',
+  'search.yearTo': 'শেষের বছর',
+  'search.anyYear': 'যেকোনো বছর',
+  'search.minRating': 'সর্বনিম্ন রেটিং',
+  'search.anyRating': 'যেকোনো রেটিং',
+  'search.status': 'অবস্থা',
+  'search.statusAny': 'যেকোনো অবস্থা',
+  'search.providers': 'প্রোভাইডার',
+  'search.allProviders': 'সব প্রোভাইডার',
+  'search.applyFilters': 'ফিল্টার প্রয়োগ করুন',
+  'search.clearFilters': 'ফিল্টার মুছুন',
+  'search.noCatalogTitle': 'এখনো কোনো ক্যাটালগ নেই',
+  'search.noCatalogBody':
+      'ক্যাটালগ খুঁজতে Settings → Providers থেকে একটি প্রোভাইডার যোগ করুন।',
+  'search.resultsFor': '“{query}”-এর ফলাফল',
+
+  // Manga
+  'manga.searchHint': 'মাঙ্গা ও মানহোয়া খুঁজুন…',
+  'manga.emptyTitle': 'এখনো কোনো মাঙ্গা বা মানহোয়া নেই',
+  'manga.emptyBody':
+      'কমিকস আছে এমন একটি প্রোভাইডার যোগ করুন, অথবা অন্য ফিল্টার চেষ্টা করুন।',
+  'manga.genreAll': 'সব ধরন',
+  'manga.newChapters': 'নতুন অধ্যায়',
+  'manga.browseAll': 'সব ব্রাউজ করুন',
+
+  // Library
+  'library.continueEmpty': 'চলমান কিছু নেই',
+  'library.continueEmptyBody':
+      'কোনো শো বা অধ্যায় শুরু করলে তা এখানে দেখা যাবে।',
+  'library.clearHistoryConfirm': 'সব দেখার ইতিহাস মুছবেন?',
+  'library.historyCleared': 'ইতিহাস মোছা হয়েছে',
+
+  // Profile
+  'profile.providers': 'আমার প্রোভাইডার',
+  'profile.developer': 'ডেভেলপার',
+  'profile.developerName': 'Jarif Ahmed',
+  'profile.codeHint':
+      'আপনার ডিভাইস কোড এই ডিভাইসে সংরক্ষিত আছে। দেখতে Settings → Backup & restore-এ যান।',
+  'profile.viewCode': 'কোড দেখুন',
+  'profile.noProfile': 'এখনো কোনো প্রোফাইল নেই',
+  'profile.signOutFailed': 'সাইন আউট করা যায়নি। আবার চেষ্টা করুন।',
+
+  // Settings
+  'settings.notificationsNote':
+      'শুধু অ্যাপের ভেতরের নোটিফিকেশন — এই সংস্করণে পুশ নোটিফিকেশন নেই।',
+  'settings.developer': 'ডেভেলপার',
+  'settings.developerName': 'Jarif Ahmed',
+  'settings.aboutBody':
+      'StreamBox আপনার নিজের JSON প্রোভাইডার ক্যাটালগ থেকে অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া এক জায়গায় নিয়ে আসে। আপনার সব তথ্য এই ডিভাইসেই থাকে — কোনো সার্ভার অ্যাকাউন্ট নেই।',
+  'settings.aboutVersion': 'সংস্করণ ০.১.০',
+
+  // Details
+  'details.notFoundTitle': 'শিরোনাম পাওয়া যায়নি',
+  'details.notFoundBody':
+      'এই শিরোনামটি সরিয়ে ফেলা হয়ে থাকতে পারে, অথবা এর প্রোভাইডার বন্ধ আছে।',
+  'details.moreLikeThis': 'এ ধরনের আরও',
+  'details.noEpisodes': 'এই শিরোনামের কোনো পর্ব তালিকাভুক্ত নেই।',
+  'details.noChapters': 'এই শিরোনামের কোনো অধ্যায় তালিকাভুক্ত নেই।',
+  'details.shareText': 'StreamBox-এ {title} দেখুন',
+  'details.noVideo': 'এই শিরোনামের কোনো ভিডিও নেই।',
+  'details.noPages': 'এই শিরোনামের কোনো পৃষ্ঠা নেই।',
+  'details.resumeEpisode': 'পর্ব {number} থেকে চালিয়ে যান',
+  'details.resumeChapter': 'অধ্যায় {number} থেকে চালিয়ে যান',
+  'details.statusUnknown': 'অজানা',
+  'details.pagesCount': '{count} পৃষ্ঠা',
+};
