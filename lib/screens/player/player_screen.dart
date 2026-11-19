@@ -18,6 +18,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/focusable_card.dart';
 import '../../widgets/player_controls.dart';
+import '../screen_helpers.dart';
 import 'player_logic.dart';
 
 /// Video player for anime episodes and movies (route `/player/:id`).
@@ -156,7 +157,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   // -- Loading ---------------------------------------------------------------
 
+  /// Episode load entry point. Belt-and-braces guard: every caller fires
+  /// this unawaited (episode tap, retry button), so an unexpected throw
+  /// inside would otherwise be an unhandled async error. Any failure
+  /// degrades to the player error state instead.
   Future<void> _loadEpisode(int index) async {
+    try {
+      await _loadEpisodeInner(index);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _initializing = false;
+        _error = 'player.videoFailed';
+      });
+    }
+  }
+
+  Future<void> _loadEpisodeInner(int index) async {
     // Save progress for the episode being left behind.
     if (!_initializing && _position > Duration.zero) _saveProgress();
 
@@ -233,6 +250,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     try {
       await controller.initialize();
     } catch (_) {
+      // Dispose the failed controller (it holds a platform texture even
+      // when initialize throws) before showing the error state.
+      try {
+        await controller.dispose();
+      } catch (_) {}
+      if (_videoController == controller) _videoController = null;
       if (!mounted) return;
       setState(() {
         _initializing = false;
@@ -240,18 +263,36 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       });
       return;
     }
-    if (!mounted) return;
+    if (!mounted) {
+      try {
+        await controller.dispose();
+      } catch (_) {}
+      return;
+    }
     if (_videoController != controller) return; // superseded by a new load
 
     final realResume = resumePositionSeconds(
       savedSeconds: resumeSeconds,
       durationSeconds: controller.value.duration.inSeconds,
     );
-    if (realResume > 0) {
-      await controller.seekTo(Duration(seconds: realResume));
+    // seekTo / setPlaybackSpeed / play are platform-channel calls — any
+    // of them can throw on a device with a broken plugin layer. The old
+    // code awaited them unguarded, so a throw here was an unhandled async
+    // error (and the spinner never cleared).
+    try {
+      if (realResume > 0) {
+        await controller.seekTo(Duration(seconds: realResume));
+      }
+      await controller.setPlaybackSpeed(_speed);
+      await controller.play();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _initializing = false;
+        _error = 'player.videoFailed';
+      });
+      return;
     }
-    await controller.setPlaybackSpeed(_speed);
-    await controller.play();
     setState(() {
       _initializing = false;
       _duration = controller.value.duration;
@@ -260,15 +301,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   }
 
   void _loadYoutube(String videoId, int resumeSeconds) {
-    final controller = YoutubePlayerController.fromVideoId(
-      videoId: videoId,
-      autoPlay: true,
-      startSeconds: resumeSeconds > 0 ? resumeSeconds.toDouble() : null,
-      params: const YoutubePlayerParams(
-        showControls: false,
-        showFullscreenButton: false,
-      ),
-    );
+    late final YoutubePlayerController controller;
+    try {
+      controller = YoutubePlayerController.fromVideoId(
+        videoId: videoId,
+        autoPlay: true,
+        startSeconds: resumeSeconds > 0 ? resumeSeconds.toDouble() : null,
+        params: const YoutubePlayerParams(
+          showControls: false,
+          showFullscreenButton: false,
+        ),
+      );
+    } catch (_) {
+      // Controller construction can throw (bad id / broken WebView) —
+      // degrade to the error state instead of crashing the load.
+      if (!mounted) return;
+      setState(() {
+        _initializing = false;
+        _error = 'player.videoFailed';
+      });
+      return;
+    }
     _ytController = controller;
 
     _ytValueSub = controller.stream.listen((value) {
@@ -314,15 +367,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     setState(() => _initializing = false);
   }
 
+  /// Every close/dispose is guarded: a controller whose platform side is
+  /// already dead throws on dispose, and this runs from dispose() and
+  /// from unawaited call sites where a throw would be unhandled.
   Future<void> _disposeControllers() async {
-    await _ytValueSub?.cancel();
-    await _ytStateSub?.cancel();
+    try {
+      await _ytValueSub?.cancel();
+    } catch (_) {}
+    try {
+      await _ytStateSub?.cancel();
+    } catch (_) {}
     _ytValueSub = null;
     _ytStateSub = null;
     _videoController?.removeListener(_onVideoTick);
-    await _videoController?.dispose();
+    try {
+      await _videoController?.dispose();
+    } catch (_) {}
     _videoController = null;
-    await _ytController?.close();
+    try {
+      await _ytController?.close();
+    } catch (_) {}
     _ytController = null;
   }
 
@@ -358,11 +422,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     if (_error != null || _initializing) return;
     if (_ended) {
       await _seekTo(Duration.zero);
+      if (!mounted) return;
       setState(() => _ended = false);
     }
-    if (_isPlaying) {
-      await _videoController?.pause();
-      await _ytController?.pauseVideo();
+    // play/pause are platform-channel calls — a broken plugin layer
+    // throws; the UI state only flips when the call actually succeeds.
+    // (Capture the pre-call state: the tick listener may flip _isPlaying
+    // while the platform call is in flight.)
+    final wasPlaying = _isPlaying;
+    try {
+      if (wasPlaying) {
+        await _videoController?.pause();
+        await _ytController?.pauseVideo();
+      } else {
+        await _videoController?.play();
+        await _ytController?.playVideo();
+      }
+    } catch (_) {
+      return;
+    }
+    if (wasPlaying) {
       _saveProgress();
       setState(() {
         _isPlaying = false;
@@ -370,8 +449,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       });
       _hideTimer?.cancel();
     } else {
-      await _videoController?.play();
-      await _ytController?.playVideo();
       setState(() => _isPlaying = true);
       _scheduleHide();
     }
@@ -379,11 +456,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   Future<void> _seekTo(Duration target) async {
     final clamped = clampSeek(target, _duration);
-    await _videoController?.seekTo(clamped);
-    await _ytController?.seekTo(
-      seconds: clamped.inSeconds.toDouble(),
-      allowSeekAhead: true,
-    );
+    try {
+      await _videoController?.seekTo(clamped);
+      await _ytController?.seekTo(
+        seconds: clamped.inSeconds.toDouble(),
+        allowSeekAhead: true,
+      );
+    } catch (_) {
+      // A failed seek leaves the position where it was — never crash.
+      return;
+    }
+    if (!mounted) return;
     setState(() => _position = clamped);
     _saveProgress();
   }
@@ -394,9 +477,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   }
 
   Future<void> _setSpeed(double speed) async {
+    try {
+      await _videoController?.setPlaybackSpeed(speed);
+      await _ytController?.setPlaybackRate(speed);
+    } catch (_) {
+      // A failed speed change keeps the old speed — never crash.
+      return;
+    }
+    if (!mounted) return;
     setState(() => _speed = speed);
-    await _videoController?.setPlaybackSpeed(speed);
-    await _ytController?.setPlaybackRate(speed);
     _scheduleHide();
   }
 
@@ -431,30 +520,42 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   // -- Fullscreen --------------------------------------------------------------
 
   Future<void> _toggleFullscreen() async {
-    if (_isFullscreen) {
-      await _restoreOrientation();
-      setState(() => _isFullscreen = false);
-    } else {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-      await SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.immersiveSticky,
-      );
-      setState(() => _isFullscreen = true);
+    // SystemChrome is a platform-channel call — guard it like every other
+    // one (a throw here used to be an unhandled async error, and the
+    // fullscreen flag would flip even though nothing changed).
+    try {
+      if (_isFullscreen) {
+        await _restoreOrientation();
+      } else {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+        await SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.immersiveSticky,
+        );
+      }
+    } catch (_) {
+      return;
     }
+    if (!mounted) return;
+    setState(() => _isFullscreen = !_isFullscreen);
     _scheduleHide();
   }
 
   Future<void> _restoreOrientation() async {
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    try {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    } catch (_) {
+      // Orientation restore is cosmetic — and this runs from dispose(),
+      // where a throw would be unhandled.
+    }
   }
 
   // -- Progress ----------------------------------------------------------------
@@ -479,7 +580,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     if (url == null) return;
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    // launchUrl is a platform-channel call (and returns false when no app
+    // can handle the URL) — the old code awaited it unguarded, so a broken
+    // plugin layer crashed the error overlay's fallback button.
+    bool launched = false;
+    try {
+      launched =
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      launched = false;
+    }
+    if (!launched && mounted) {
+      showSnack(context, tr(context, 'common.errorGeneric'));
+    }
   }
 
   // -- Build -------------------------------------------------------------------

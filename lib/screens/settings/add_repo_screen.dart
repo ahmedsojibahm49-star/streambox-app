@@ -70,7 +70,13 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
       _showMessage(tr(context, 'providers.providerAdded'));
       context.pop();
     } on RepoException catch (e) {
-      setState(() => _error = e.message);
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      // Non-repo failures (e.g. a Hive write error) used to be unhandled
+      // async errors — show a generic message instead.
+      if (mounted) {
+        setState(() => _error = tr(context, 'common.errorGeneric'));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -94,7 +100,11 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
       _showMessage(tr(context, 'providers.providerAdded'));
       context.pop();
     } on RepoException catch (e) {
-      setState(() => _error = e.message);
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = tr(context, 'common.errorGeneric'));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }

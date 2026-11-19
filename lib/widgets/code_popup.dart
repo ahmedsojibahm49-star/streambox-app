@@ -74,11 +74,29 @@ Future<void> showCodePopup(
                   icon: const Icon(Iconsax.copy, size: 20),
                   tooltip: tr(context, 'auth.codeCopied'),
                   onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: code));
+                    // Clipboard is a platform-channel call — guard it
+                    // (a broken plugin layer used to crash the copy
+                    // button with an unhandled async error).
+                    bool copied = false;
+                    try {
+                      await Clipboard.setData(
+                        ClipboardData(text: code),
+                      );
+                      copied = true;
+                    } catch (_) {
+                      copied = false;
+                    }
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(tr(context, 'auth.codeCopied')),
+                          content: Text(
+                            tr(
+                              context,
+                              copied
+                                  ? 'auth.codeCopied'
+                                  : 'common.errorGeneric',
+                            ),
+                          ),
                         ),
                       );
                     }

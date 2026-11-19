@@ -84,7 +84,14 @@ class LibraryScreen extends ConsumerWidget {
       ),
     );
     if (confirmed == true && context.mounted) {
-      await ref.read(historyProvider.notifier).clear();
+      try {
+        await ref.read(historyProvider.notifier).clear();
+      } catch (_) {
+        if (context.mounted) {
+          showSnack(context, tr(context, 'common.errorGeneric'));
+        }
+        return;
+      }
       if (context.mounted) {
         showSnack(context, tr(context, 'library.historyCleared'));
       }
@@ -138,14 +145,21 @@ class _LibraryListTab extends ConsumerWidget {
           onRemove: () async {
             // Branch (don't unify the two notifiers in one variable —
             // the ternary would widen to Notifier and lose .toggle).
-            if (list == LibraryList.myList) {
-              await ref
-                  .read(myListProvider.notifier)
-                  .toggle(pair.item.id, pair.item.providerId);
-            } else {
-              await ref
-                  .read(favoritesProvider.notifier)
-                  .toggle(pair.item.id, pair.item.providerId);
+            try {
+              if (list == LibraryList.myList) {
+                await ref
+                    .read(myListProvider.notifier)
+                    .toggle(pair.item.id, pair.item.providerId);
+              } else {
+                await ref
+                    .read(favoritesProvider.notifier)
+                    .toggle(pair.item.id, pair.item.providerId);
+              }
+            } catch (_) {
+              if (context.mounted) {
+                showSnack(context, tr(context, 'common.errorGeneric'));
+              }
+              return;
             }
             if (context.mounted) {
               showSnack(
@@ -216,10 +230,16 @@ class _HistoryTab extends ConsumerWidget {
             episodeOrChapter: entry.episodeOrChapter,
           ),
           onRemove: () async {
-            await ref.read(historyProvider.notifier).remove(
-                  itemId: item.id,
-                  providerId: item.providerId,
-                );
+            try {
+              await ref.read(historyProvider.notifier).remove(
+                    itemId: item.id,
+                    providerId: item.providerId,
+                  );
+            } catch (_) {
+              if (context.mounted) {
+                showSnack(context, tr(context, 'common.errorGeneric'));
+              }
+            }
           },
         );
       },
@@ -273,10 +293,16 @@ class _ContinueWatchingTab extends ConsumerWidget {
             episodeOrChapter: entry.episodeOrChapter,
           ),
           onRemove: () async {
-            await ref.read(historyProvider.notifier).remove(
-                  itemId: item.id,
-                  providerId: item.providerId,
-                );
+            try {
+              await ref.read(historyProvider.notifier).remove(
+                    itemId: item.id,
+                    providerId: item.providerId,
+                  );
+            } catch (_) {
+              if (context.mounted) {
+                showSnack(context, tr(context, 'common.errorGeneric'));
+              }
+            }
           },
         );
       },

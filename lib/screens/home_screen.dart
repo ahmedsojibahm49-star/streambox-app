@@ -70,8 +70,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       await ref.read(providerServiceProvider).refreshAll();
     } catch (_) {
-      // The providers stub throws until the providers workstream lands;
-      // a real failure shows the same honest message.
+      // A failed refresh (network down, a repo unreachable) shows an
+      // honest message instead of crashing the pull-to-refresh.
       if (mounted) showSnack(context, tr(context, 'home.refreshFailed'));
     }
   }

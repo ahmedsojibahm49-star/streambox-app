@@ -56,6 +56,10 @@ class StartupNotifier extends Notifier<BootstrapResult> {
 /// (defaults / error screen) instead of dying before runApp — a throw
 /// here used to leave the white Android launch background up forever
 /// (white screen on launch, Nov 19).
+///
+/// Storage init uses [initHiveWithFallback]: if the documents directory
+/// is unusable on a device, Hive retries the support, temp, then cache
+/// directory before the startup error screen appears.
 Future<BootstrapResult> bootstrap() async {
   // Android immersive mode: hide system nav on entry (swipe brings it back).
   // Android ONLY — iOS/web keep their system UI. The player handles its own
@@ -69,17 +73,19 @@ Future<BootstrapResult> bootstrap() async {
   }
 
   // Local storage: Hive boxes (all data is on-device, no server).
+  // initHiveWithFallback tries the documents, support, temp, then cache
+  // directory — a broken documents-dir call must not kill startup.
   Object? storageError;
   AppSettings settings = AppSettings();
   var hiveReady = false;
   try {
-    await Hive.initFlutter();
+    await initHiveWithFallback();
     hiveReady = true;
     await initStorage();
   } catch (e) {
-    // Corrupt box file (or an unusable directory): delete the box files
-    // and try once more before giving up. Recovery needs a Hive path, so
-    // it only runs when initFlutter succeeded.
+    // initStorage failed (e.g. corrupt box file) after Hive had a working
+    // directory: delete the box files and try once more before giving up.
+    // Recovery needs a Hive path, so it only runs when init succeeded.
     if (hiveReady) {
       try {
         await recoverStorage();

@@ -18,8 +18,12 @@ import 'screen_helpers.dart';
 /// minimum rating, status, provider), sort options, and per-type result
 /// counts.
 ///
-/// Deep links: `/search?type=anime|movie|manga|manhwa` and
-/// `/search?q=...` pre-fill the type filter / query (used by Home rails).
+/// Deep links: `/search?type=anime|movie|manga|manhwa`,
+/// `/search?q=...` and `/search?genre=...` pre-fill the type filter /
+/// query / genre filter (used by Home rails and Details genre chips).
+/// The params are re-applied whenever the route's query string changes —
+/// the screen keeps its state across tab switches, so a one-time apply
+/// would ignore later deep links.
 ///
 /// Never blank: with no catalog it explains how to add a provider; with
 /// no matches it explains why and offers to clear the filters.
@@ -39,29 +43,54 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   ContentType? _type;
   _SortOption _sort = _SortOption.relevance;
   _Filters _filters = const _Filters();
-  bool _initialized = false;
+
+  /// Query-string signature the screen last applied. The screen lives in
+  /// a StatefulShellBranch, so its state survives tab switches — the deep
+  /// link must be re-applied whenever the URI's params CHANGE (audit fix,
+  /// Nov 19: the old `_initialized` flag applied them once and ignored
+  /// every later deep link, so Home's "See all" for Movies did nothing
+  /// after "See all" for Anime had already been tapped).
+  String? _appliedParams;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_initialized) return;
-    _initialized = true;
     final params = GoRouterState.of(context).uri.queryParameters;
+    final signature =
+        params.entries.map((e) => '${e.key}=${e.value}').join('&');
+    if (signature == _appliedParams) return;
+    _appliedParams = signature;
+    // A deep link defines the whole search view: type, query and genre
+    // come from the params (absent = cleared); the other filters stay.
     final typeParam = params['type'];
-    if (typeParam != null) {
-      _type = switch (typeParam) {
-        'anime' => ContentType.anime,
-        'movie' => ContentType.movie,
-        'manga' => ContentType.manga,
-        'manhwa' => ContentType.manhwa,
-        _ => null,
-      };
+    final nextType = switch (typeParam) {
+      'anime' => ContentType.anime,
+      'movie' => ContentType.movie,
+      'manga' => ContentType.manga,
+      'manhwa' => ContentType.manhwa,
+      _ => null,
+    };
+    final nextQuery = params['q'] ?? '';
+    final genreParam = params['genre'];
+    final nextGenres =
+        genreParam == null || genreParam.isEmpty ? <String>{} : {genreParam};
+    // Skip the rebuild when the deep link matches the current state.
+    if (_controller.text == nextQuery &&
+        _type == nextType &&
+        _query == nextQuery &&
+        _filters.genres.length == nextGenres.length &&
+        _filters.genres.containsAll(nextGenres)) {
+      return;
     }
-    final q = params['q'];
-    if (q != null && q.isNotEmpty) {
-      _controller.text = q;
-      _query = q;
-    }
+    // didChangeDependencies runs before the first build (where setState
+    // is harmless) and on later route changes (where it is required to
+    // rebuild). Calling setState here is explicitly allowed.
+    setState(() {
+      _type = nextType;
+      _query = nextQuery;
+      _controller.text = nextQuery;
+      _filters = _filters.copyWith(genres: nextGenres);
+    });
   }
 
   @override
@@ -485,8 +514,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                 ),
               ),
-              GestureDetector(
-                onTap: _openSortSheet,
+              // FocusableCard (not a bare GestureDetector) so the sort
+              // control is reachable by D-pad on Android TV.
+              FocusableCard(
+                onPressed: _openSortSheet,
+                borderRadius: 999,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

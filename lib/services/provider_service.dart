@@ -161,12 +161,18 @@ class HiveProviderService implements ProviderService {
 
   /// Download the raw repo JSON. Throws [RepoException] with an exact,
   /// user-facing message for network / timeout / non-200 / oversize errors.
+  ///
+  /// STREAMED (audit fix, Nov 19): the old code used `_httpClient.get()`,
+  /// which downloads the ENTIRE body before the 5 MB size check ran — a
+  /// hostile or misconfigured host serving a 500 MB file would OOM the
+  /// app before the check ever fired. The body is now read chunk by
+  /// chunk and aborted the moment it exceeds [maxRepoBytes].
   Future<String> _fetchRawJson(String url) async {
-    http.Response response;
+    http.StreamedResponse streamed;
     try {
-      response = await _httpClient
-          .get(Uri.parse(url))
-          .timeout(fetchTimeout);
+      final request = http.Request('GET', Uri.parse(url));
+      streamed =
+          await _httpClient.send(request).timeout(fetchTimeout);
     } on TimeoutException {
       throw RepoException(
         'The request timed out after ${fetchTimeout.inSeconds} seconds. '
@@ -187,28 +193,54 @@ class HiveProviderService implements ProviderService {
         'Could not reach the server. Check your connection and the URL, '
         'then try again.',
       );
-    }
-    if (response.statusCode != 200) {
+    } on Exception {
       throw RepoException(
-        'The server returned HTTP ${response.statusCode} for this URL. '
+        'Could not reach the server. Check your connection and the URL, '
+        'then try again.',
+      );
+    }
+    if (streamed.statusCode != 200) {
+      throw RepoException(
+        'The server returned HTTP ${streamed.statusCode} for this URL. '
         'Check the link and try again.',
       );
     }
-    if (response.bodyBytes.length > maxRepoBytes) {
-      final mb =
-          (response.bodyBytes.length / (1024 * 1024)).toStringAsFixed(1);
-      throw RepoException(
-        'This repo file is too large ($mb MB). Repos must be under 5 MB.',
-      );
-    }
+    final bodyBytes = await _readCappedBody(streamed.stream);
     try {
-      return utf8.decode(response.bodyBytes);
+      return utf8.decode(bodyBytes);
     } on FormatException {
       throw RepoException(
         'This file is not valid UTF-8 text. Save the repo JSON as UTF-8 '
         'and try again.',
       );
     }
+  }
+
+  /// Read a response body, aborting as soon as it exceeds [maxRepoBytes]
+  /// so an oversized file never sits fully in memory. The read itself is
+  /// bounded by [fetchTimeout] (a stalled body must not hang forever).
+  Future<List<int>> _readCappedBody(Stream<List<int>> stream) async {
+    final bytes = <int>[];
+    try {
+      await for (final chunk in stream.timeout(fetchTimeout)) {
+        bytes.addAll(chunk);
+        if (bytes.length > maxRepoBytes) {
+          final mb = (bytes.length / (1024 * 1024)).toStringAsFixed(1);
+          throw RepoException(
+            'This repo file is too large ($mb MB). Repos must be under '
+            '5 MB.',
+          );
+        }
+      }
+    } on RepoException {
+      rethrow;
+    } on TimeoutException {
+      throw RepoException(
+        'The request timed out after ${fetchTimeout.inSeconds} seconds. '
+        'Check your connection and try again.',
+      );
+    }
+    return bytes;
   }
 
   // -- Parse ---------------------------------------------------------------
@@ -433,6 +465,18 @@ class HiveProviderService implements ProviderService {
           'must be a video URL string.',
         );
       }
+      // `youtubeId` is a first-class source (the player embeds it) — it
+      // must be validated AND preserved. Audit fix, Nov 19: the parser
+      // used to rebuild the episode map without this field, so a repo
+      // using youtubeId silently lost every video (the player saw "no
+      // source" for episodes that had one).
+      if (ep['youtubeId'] != null && ep['youtubeId'] is! String) {
+        throw RepoException(
+          'Item "$itemId", episode $number has an invalid "youtubeId" — '
+          'it must be a YouTube video id string, for example '
+          '"dQw4w9WgXcQ".',
+        );
+      }
       final duration = ep['durationSeconds'];
       if (duration != null && duration is! int) {
         throw RepoException(
@@ -444,6 +488,7 @@ class HiveProviderService implements ProviderService {
         'number': number,
         if (ep['title'] != null) 'title': ep['title'],
         if (ep['videoUrl'] != null) 'videoUrl': ep['videoUrl'],
+        if (ep['youtubeId'] != null) 'youtubeId': ep['youtubeId'],
         'durationSeconds': ?duration,
       });
     }

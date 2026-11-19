@@ -1,8 +1,29 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Release signing: reads android/key.properties when present (created by
+// the GitHub Actions workflow from secrets, or by hand for local builds).
+// Without it the release build falls back to the debug keys so
+// `flutter run --release` keeps working — but a debug-signed APK triggers
+// stronger Play Protect warnings, so published releases should always be
+// signed with the release key. NEVER commit key.properties or the
+// keystore — both are gitignored (see .gitignore).
+val keyProperties = Properties()
+val keyPropertiesFile = rootProject.file("key.properties")
+if (keyPropertiesFile.exists()) {
+    keyProperties.load(FileInputStream(keyPropertiesFile))
+}
+val hasReleaseSigning = keyPropertiesFile.exists() &&
+    keyProperties["storeFile"] != null &&
+    keyProperties["storePassword"] != null &&
+    keyProperties["keyAlias"] != null &&
+    keyProperties["keyPassword"] != null
 
 android {
     namespace = "com.kizoo.streambox"
@@ -39,11 +60,26 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Release-signed when key.properties is present, debug-signed
+            // otherwise (local runs without the keystore keep working).
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

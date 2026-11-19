@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -151,7 +152,12 @@ class DetailsScreen extends ConsumerWidget {
                           ChipToggle(
                             label: genre,
                             selected: false,
-                            onTap: () {},
+                            // Genre chips open Search filtered to that
+                            // genre (audit fix, Nov 19 — they used to be
+                            // dead buttons with an empty onTap).
+                            onTap: () => context.go(
+                              '/search?genre=${Uri.encodeComponent(genre)}',
+                            ),
                           ),
                       ],
                     ),
@@ -179,19 +185,28 @@ class DetailsScreen extends ConsumerWidget {
                             : tr(context, 'details.addToList'),
                         active: inMyList,
                         onPressed: () async {
-                          final added = await ref
-                              .read(myListProvider.notifier)
-                              .toggle(item.id, item.providerId);
-                          if (context.mounted) {
-                            showSnack(
-                              context,
-                              tr(
+                          try {
+                            final added = await ref
+                                .read(myListProvider.notifier)
+                                .toggle(item.id, item.providerId);
+                            if (context.mounted) {
+                              showSnack(
                                 context,
-                                added
-                                    ? 'library.addedToList'
-                                    : 'library.removedFromList',
-                              ),
-                            );
+                                tr(
+                                  context,
+                                  added
+                                      ? 'library.addedToList'
+                                      : 'library.removedFromList',
+                                ),
+                              );
+                            }
+                          } catch (_) {
+                            if (context.mounted) {
+                              showSnack(
+                                context,
+                                tr(context, 'common.errorGeneric'),
+                              );
+                            }
                           }
                         },
                       ),
@@ -204,19 +219,28 @@ class DetailsScreen extends ConsumerWidget {
                         tooltip: tr(context, 'details.favorite'),
                         active: isFavorite,
                         onPressed: () async {
-                          final added = await ref
-                              .read(favoritesProvider.notifier)
-                              .toggle(item.id, item.providerId);
-                          if (context.mounted) {
-                            showSnack(
-                              context,
-                              tr(
+                          try {
+                            final added = await ref
+                                .read(favoritesProvider.notifier)
+                                .toggle(item.id, item.providerId);
+                            if (context.mounted) {
+                              showSnack(
                                 context,
-                                added
-                                    ? 'library.addedToFavorites'
-                                    : 'library.removedFromFavorites',
-                              ),
-                            );
+                                tr(
+                                  context,
+                                  added
+                                      ? 'library.addedToFavorites'
+                                      : 'library.removedFromFavorites',
+                                ),
+                              );
+                            }
+                          } catch (_) {
+                            if (context.mounted) {
+                              showSnack(
+                                context,
+                                tr(context, 'common.errorGeneric'),
+                              );
+                            }
                           }
                         },
                       ),
@@ -225,16 +249,29 @@ class DetailsScreen extends ConsumerWidget {
                         context,
                         icon: Iconsax.share,
                         tooltip: tr(context, 'common.share'),
-                        onPressed: () {
-                          SharePlus.instance.share(
-                            ShareParams(
-                              text: trParams(
-                                context,
-                                'details.shareText',
-                                {'title': item.title},
+                        // share_plus is a platform-channel call — the old
+                        // code fired it unawaited and unguarded, so a
+                        // broken plugin layer was an unhandled async
+                        // error and the user got no feedback at all.
+                        onPressed: () async {
+                          try {
+                            await SharePlus.instance.share(
+                              ShareParams(
+                                text: trParams(
+                                  context,
+                                  'details.shareText',
+                                  {'title': item.title},
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } catch (_) {
+                            if (context.mounted) {
+                              showSnack(
+                                context,
+                                tr(context, 'common.errorGeneric'),
+                              );
+                            }
+                          }
                         },
                       ),
                     ],
@@ -408,10 +445,13 @@ class DetailsScreen extends ConsumerWidget {
     bool active = false,
   }) {
     final palette = context.palette;
+    // FocusableCard (not a bare GestureDetector) so the buttons are
+    // reachable by D-pad on Android TV like every other card in the app.
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
-        onTap: onPressed,
+      child: FocusableCard(
+        onPressed: onPressed,
+        borderRadius: AppColors.radiusM,
         child: Container(
           width: 52,
           height: 52,

@@ -100,6 +100,7 @@ just a list of titles with the links the repo author chose to include.
 | `number` | integer | **yes** | Episode number (1-based). |
 | `title` | string | no | Episode title. |
 | `videoUrl` | string | no | Direct video file URL (MP4 etc.) played by the player. No extraction is ever performed — the URL must point at the video itself. |
+| `youtubeId` | string | no | YouTube video id (the 11-character id from a youtube.com/watch?v=… URL), played as an embedded YouTube video. When an episode has both `youtubeId` and `videoUrl`, YouTube wins. |
 | `durationSeconds` | integer | no | Length in seconds (progress + "resume from"). |
 
 ### Chapter
@@ -125,8 +126,8 @@ manga, manhwa.`
 - `year` must be a whole number; `rating` a number from 0 to 10; `genres`
   an array of strings; `posterUrl` / `backdropUrl` / `overview` / `status`
   strings when present.
-- Every episode needs an integer `number`; `title` / `videoUrl` must be
-  strings and `durationSeconds` an integer when present.
+- Every episode needs an integer `number`; `title` / `videoUrl` /
+  `youtubeId` must be strings and `durationSeconds` an integer when present.
 - Every chapter needs an integer `number`; `title` must be a string and
   `pageUrls` an array of strings when present.
 

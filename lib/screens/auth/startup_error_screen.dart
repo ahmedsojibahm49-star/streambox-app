@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../theme/app_theme.dart';
@@ -8,20 +11,55 @@ import '../../widgets/gradient_button.dart';
 /// (see `bootstrap()` in main.dart). A visible, branded error screen with
 /// a Retry button — never a white screen.
 ///
+/// The FULL error is shown (scrollable) with a Copy button, so the user
+/// can send us the complete diagnosis instead of a truncated snippet.
+///
 /// Strings are hardcoded English on purpose: this is a last-resort screen
 /// and must not depend on the i18n maps.
-class StartupErrorScreen extends StatelessWidget {
+class StartupErrorScreen extends StatefulWidget {
   const StartupErrorScreen({
     super.key,
     required this.error,
     required this.onRetry,
   });
 
-  /// The storage error that blocked startup (shown truncated).
+  /// The storage error that blocked startup (shown in full).
   final Object error;
 
   /// Re-runs the bootstrap (see `StartupNotifier.retry`).
   final VoidCallback onRetry;
+
+  @override
+  State<StartupErrorScreen> createState() => _StartupErrorScreenState();
+}
+
+class _StartupErrorScreenState extends State<StartupErrorScreen> {
+  bool _copied = false;
+  Timer? _copiedTimer;
+
+  @override
+  void dispose() {
+    _copiedTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copyError() async {
+    // Clipboard is a platform-channel call — guard it (this screen
+    // exists precisely for devices whose platform layer is broken).
+    try {
+      await Clipboard.setData(
+        ClipboardData(text: widget.error.toString()),
+      );
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _copied = true);
+    _copiedTimer?.cancel();
+    _copiedTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,97 +67,124 @@ class StartupErrorScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.darkBg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius:
-                        BorderRadius.circular(AppColors.radiusXl),
-                    boxShadow: AppColors.glowShadow,
-                  ),
-                  child: const Icon(
-                    Iconsax.play_copy,
-                    size: 40,
-                    color: Colors.white,
-                  ),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(
+                            AppColors.radiusXl,
+                          ),
+                          boxShadow: AppColors.glowShadow,
+                        ),
+                        child: const Icon(
+                          Iconsax.play_copy,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'StreamBox',
+                      textAlign: TextAlign.center,
+                      style: textTheme.displayMedium?.copyWith(
+                        color: AppColors.darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Couldn't start StreamBox",
+                      textAlign: TextAlign.center,
+                      style: textTheme.titleLarge?.copyWith(
+                        color: AppColors.darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Local storage could not be opened on this device. '
+                      'Your library and settings live in local storage, so '
+                      'the app cannot continue without it.',
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.darkMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      constraints:
+                          const BoxConstraints(maxHeight: 200),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.darkCard,
+                        borderRadius: BorderRadius.circular(
+                          AppColors.radiusM,
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        child: SelectableText(
+                          widget.error.toString(),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.darkMuted,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _copyError,
+                        icon: Icon(
+                          _copied
+                              ? Iconsax.copy_success
+                              : Iconsax.copy,
+                          size: 18,
+                          color: AppColors.brand,
+                        ),
+                        label: Text(
+                          _copied ? 'Copied!' : 'Copy error',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.brand,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GradientButton(
+                      label: 'Try again',
+                      onPressed: widget.onRetry,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'If this keeps happening, clear the app data in '
+                      'Android Settings → Apps → StreamBox → Storage → '
+                      'Clear data, then open the app again.',
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: AppColors.darkMuted,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              Text(
-                'StreamBox',
-                textAlign: TextAlign.center,
-                style: textTheme.displayMedium?.copyWith(
-                  color: AppColors.darkText,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "Couldn't start StreamBox",
-                textAlign: TextAlign.center,
-                style: textTheme.titleLarge?.copyWith(
-                  color: AppColors.darkText,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Local storage could not be opened on this device. '
-                'Your library and settings live in local storage, so the '
-                'app cannot continue without it.',
-                textAlign: TextAlign.center,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: AppColors.darkMuted,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.darkCard,
-                  borderRadius:
-                      BorderRadius.circular(AppColors.radiusM),
-                ),
-                child: Text(
-                  _shortError(error),
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.darkMuted,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              GradientButton(
-                label: 'Try again',
-                onPressed: onRetry,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'If this keeps happening, clear the app data in Android '
-                'Settings → Apps → StreamBox → Storage → Clear data, '
-                'then open the app again.',
-                textAlign: TextAlign.center,
-                style: textTheme.bodySmall?.copyWith(
-                  color: AppColors.darkMuted,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  static String _shortError(Object error) {
-    final text = error.toString();
-    if (text.length <= 200) return text;
-    return '${text.substring(0, 200)}…';
   }
 }
 

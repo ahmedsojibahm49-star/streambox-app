@@ -147,19 +147,22 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
   Future<void> _import() async {
     if (_busy) return;
-    final picked = await FilePicker.pickFile(
-      type: FileType.custom,
-      allowedExtensions: ['sbbackup'],
-    );
-    if (picked == null || !mounted) return;
-    final code = await _askForCode();
-    if (code == null || !mounted) return;
-
     setState(() {
       _busy = true;
       _busyLabelKey = 'backup.restoring';
     });
     try {
+      // FilePicker is a platform-channel call — it can throw on a device
+      // with a broken plugin layer. The old code called it OUTSIDE the
+      // try block, so a throw here was an unhandled async error.
+      final picked = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: ['sbbackup'],
+      );
+      if (picked == null || !mounted) return;
+      final code = await _askForCode();
+      if (code == null || !mounted) return;
+
       // Decrypt first (validates the code) WITHOUT changing any data.
       // readAsBytes works on every platform (web picks have no path).
       final pickedBytes = await picked.readAsBytes();

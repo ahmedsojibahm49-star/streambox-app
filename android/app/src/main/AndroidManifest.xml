@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Network access: provider repo fetches, poster/backdrop images,
+         video streaming and the YouTube player all need it. Without this
+         permission every network call fails on Android (SocketException),
+         so the app would silently show no providers, no images and no
+         video. (Audit fix, Nov 19 — the permission was missing.) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Android TV: Leanback support is optional (app also runs on phones),
          touchscreen is not required (D-pad navigation). -->
     <uses-feature

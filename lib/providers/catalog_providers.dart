@@ -49,6 +49,9 @@ class ProvidersListNotifier extends Notifier<List<ProviderRepo>> {
     } on RepoException {
       // Seeding only fails if the bundled sample data is corrupt; the
       // list stays as-is and the providers screen shows the empty state.
+    } catch (_) {
+      // Same: a Hive failure during the lazy seed must never crash
+      // startup (this runs unawaited from build()).
     }
   }
 

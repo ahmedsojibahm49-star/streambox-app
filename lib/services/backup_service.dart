@@ -8,7 +8,6 @@ import 'package:encrypt/encrypt.dart' as enc;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/models.dart';
@@ -149,7 +148,7 @@ class BackupCrypto {
 class BackupService {
   BackupService({CredentialStorage? credentials})
       : _credentials =
-            credentials ?? FlutterSecureCredentialStorage();
+            credentials ?? ResilientCredentialStorage();
 
   final CredentialStorage _credentials;
 
@@ -221,13 +220,30 @@ class BackupService {
     } on BackupException {
       rethrow;
     } catch (_) {
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/$fileName');
-      await file.writeAsBytes(bytes);
-      await SharePlus.instance.share(
-        ShareParams(files: [XFile(file.path)]),
-      );
-      return file.path;
+      // No save dialog on this platform (or it failed — e.g. a broken
+      // platform channel on the device): write into the app's own
+      // directory and open the share sheet instead. The directory lookup
+      // uses the direct Android paths first, so it still works on a
+      // device whose path_provider layer is broken (the old code called
+      // getApplicationDocumentsDirectory() here unguarded — on such a
+      // device the fallback itself threw a raw error instead of a
+      // BackupException). The share sheet is best-effort: the file is
+      // saved either way and the returned path tells the user where.
+      try {
+        final dir = await bestWritableAppDir();
+        final file = File('${dir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        try {
+          await SharePlus.instance.share(
+            ShareParams(files: [XFile(file.path)]),
+          );
+        } catch (_) {
+          // Share sheet unavailable — the file is still saved.
+        }
+        return file.path;
+      } catch (_) {
+        throw const BackupException('backup.failed');
+      }
     }
   }
 
@@ -292,8 +308,34 @@ class BackupService {
   }
 
   /// Replace the Hive boxes with the payload's data (no credential work).
+  ///
+  /// ATOMIC (audit fix, Nov 19): every entry is parsed FIRST, and the
+  /// boxes are only cleared once all of them parse cleanly. The old code
+  /// cleared the boxes first and parsed while restoring — a single corrupt
+  /// entry (e.g. a bad `list` value in one library row) threw midway and
+  /// left the user with NO data at all: the old data was already wiped
+  /// and the restore had failed.
   Future<void> restoreData(Map<String, dynamic> payload) async {
     _validatePayload(payload);
+
+    // Parse everything before touching any box — every _fromJson below
+    // throws BackupException('backup.invalidFile') on bad data, and at
+    // this point nothing has been deleted yet.
+    final profileJson = payload['profile'];
+    final profile = profileJson is Map<String, dynamic>
+        ? _profileFromJson(profileJson)
+        : null;
+    final library =
+        _jsonList(payload['library']).map(_libraryFromJson).toList();
+    final history =
+        _jsonList(payload['history']).map(_historyFromJson).toList();
+    final providers =
+        _jsonList(payload['providers']).map(_repoFromJson).toList();
+    final catalog = _jsonList(payload['catalog']).map(_itemFromJson).toList();
+    final settingsJson = payload['settings'];
+    final settings = settingsJson is Map<String, dynamic>
+        ? _settingsFromJson(settingsJson)
+        : AppSettings();
 
     final profileBox = Hive.box<UserProfile>(BoxNames.profile);
     final libraryBox = Hive.box<LibraryEntry>(BoxNames.library);
@@ -311,34 +353,22 @@ class BackupService {
       settingsBox.clear(),
     ]);
 
-    final profileJson = payload['profile'];
-    if (profileJson is Map<String, dynamic>) {
-      await profileBox.put('current', _profileFromJson(profileJson));
+    if (profile != null) {
+      await profileBox.put('current', profile);
     }
-
-    final library = _jsonList(payload['library']);
     await libraryBox.putAll({
-      for (final e in library.map(_libraryFromJson)) e.boxKey: e,
+      for (final e in library) e.boxKey: e,
     });
-    final history = _jsonList(payload['history']);
     await historyBox.putAll({
-      for (final e in history.map(_historyFromJson)) e.boxKey: e,
+      for (final e in history) e.boxKey: e,
     });
-    final providers = _jsonList(payload['providers']);
     await providersBox.putAll({
-      for (final r in providers.map(_repoFromJson)) r.id: r,
+      for (final r in providers) r.id: r,
     });
-    final catalog = _jsonList(payload['catalog']);
     await catalogBox.putAll({
-      for (final i in catalog.map(_itemFromJson)) i.boxKey: i,
+      for (final i in catalog) i.boxKey: i,
     });
-    final settingsJson = payload['settings'];
-    await settingsBox.put(
-      'current',
-      settingsJson is Map<String, dynamic>
-          ? _settingsFromJson(settingsJson)
-          : AppSettings(),
-    );
+    await settingsBox.put('current', settings);
   }
 
   // -- Helpers ---------------------------------------------------------------

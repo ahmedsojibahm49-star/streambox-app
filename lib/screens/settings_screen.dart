@@ -9,6 +9,7 @@ import '../models/models.dart';
 import '../services/storage.dart';
 import '../theme/app_theme.dart';
 import '../widgets/widgets.dart';
+import 'screen_helpers.dart';
 
 /// Settings: theme (System / Dark / Light), language (English / বাংলা),
 /// Providers → `/settings/providers`, Backup → `/backup`, notifications
@@ -47,25 +48,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ThemeMode.light => 'light',
       ThemeMode.system => 'system',
     };
-    await Hive.box<AppSettings>(BoxNames.settings)
-        .put('current', settings);
+    try {
+      await Hive.box<AppSettings>(BoxNames.settings)
+          .put('current', settings);
+    } catch (_) {
+      // The setters are called unawaited from onTap — a Hive failure used
+      // to be an unhandled async error. Keep the old theme and say so.
+      if (mounted) {
+        showSnack(context, tr(context, 'common.errorGeneric'));
+      }
+      return;
+    }
     ref.read(themeModeProvider.notifier).setThemeMode(mode);
   }
 
   Future<void> _setLocale(Locale locale) async {
     final settings = _settings();
     settings.localeCode = locale.languageCode;
-    await Hive.box<AppSettings>(BoxNames.settings)
-        .put('current', settings);
+    try {
+      await Hive.box<AppSettings>(BoxNames.settings)
+          .put('current', settings);
+    } catch (_) {
+      if (mounted) {
+        showSnack(context, tr(context, 'common.errorGeneric'));
+      }
+      return;
+    }
     ref.read(localeProvider.notifier).setLocale(locale);
   }
 
   Future<void> _setNotifications(bool value) async {
     final settings = _settings();
     settings.notificationsEnabled = value;
-    await Hive.box<AppSettings>(BoxNames.settings)
-        .put('current', settings);
-    setState(() => _notificationsEnabled = value);
+    try {
+      await Hive.box<AppSettings>(BoxNames.settings)
+          .put('current', settings);
+    } catch (_) {
+      if (mounted) {
+        showSnack(context, tr(context, 'common.errorGeneric'));
+      }
+      return;
+    }
+    if (mounted) setState(() => _notificationsEnabled = value);
   }
 
   @override
@@ -338,7 +362,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(tr(context, 'settings.developer')),
-        content: Text(tr(context, 'settings.developerName')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 40,
+              backgroundImage:
+                  AssetImage('assets/images/developer_photo.jpg'),
+            ),
+            const SizedBox(height: 12),
+            Text(tr(context, 'settings.developerName')),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

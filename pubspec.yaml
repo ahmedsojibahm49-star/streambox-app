@@ -68,6 +68,7 @@ flutter:
 
   assets:
     - assets/artwork/
+    - assets/images/
     # Bundled sample repo JSON ("Load example" in AddRepoScreen).
     # Generated from lib/data/sample_provider.dart — see
     # tool/generate_sample_repo.dart.

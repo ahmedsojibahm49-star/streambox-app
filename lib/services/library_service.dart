@@ -190,6 +190,11 @@ class HistoryNotifier extends Notifier<List<HistoryEntry>> {
   List<HistoryEntry> build() =>
       ref.read(libraryServiceProvider).recentHistory();
 
+  /// Record progress. BEST-EFFORT (audit fix, Nov 19): the player and
+  /// reader call this fire-and-forget (`unawaited`) from timers and
+  /// dispose(), so a Hive failure here used to surface as an unhandled
+  /// async error. Progress must never break playback — a failed write is
+  /// swallowed and the in-memory state is left untouched.
   Future<void> record({
     required String itemId,
     required String providerId,
@@ -198,13 +203,17 @@ class HistoryNotifier extends Notifier<List<HistoryEntry>> {
     int page = 0,
   }) async {
     final service = ref.read(libraryServiceProvider);
-    await service.recordProgress(
-      itemId: itemId,
-      providerId: providerId,
-      episodeOrChapter: episodeOrChapter,
-      positionSeconds: positionSeconds,
-      page: page,
-    );
+    try {
+      await service.recordProgress(
+        itemId: itemId,
+        providerId: providerId,
+        episodeOrChapter: episodeOrChapter,
+        positionSeconds: positionSeconds,
+        page: page,
+      );
+    } catch (_) {
+      return;
+    }
     state = service.recentHistory();
   }
 

@@ -36,12 +36,17 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
 
   Future<void> _refreshRepo(ProviderRepo repo) async {
     final successMessage = tr(context, 'providers.providerRefreshed');
+    final errorMessage = tr(context, 'common.errorGeneric');
     setState(() => _refreshingId = repo.id);
     try {
       await ref.read(providersListProvider.notifier).refresh(repo.id);
       _showMessage(successMessage);
     } on RepoException catch (e) {
       _showMessage(e.message, isError: true);
+    } catch (_) {
+      // Non-repo failures (e.g. a Hive write error) used to be unhandled
+      // async errors — show a generic message instead.
+      _showMessage(errorMessage, isError: true);
     } finally {
       if (mounted) setState(() => _refreshingId = null);
     }
@@ -49,12 +54,15 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
 
   Future<void> _refreshAll() async {
     final successMessage = tr(context, 'providers.providerRefreshed');
+    final errorMessage = tr(context, 'common.errorGeneric');
     setState(() => _refreshingAll = true);
     try {
       await ref.read(providersListProvider.notifier).refreshAll();
       _showMessage(successMessage);
     } on RepoException catch (e) {
       _showMessage(e.message, isError: true);
+    } catch (_) {
+      _showMessage(errorMessage, isError: true);
     } finally {
       if (mounted) setState(() => _refreshingAll = false);
     }
@@ -88,19 +96,25 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
     );
     if (confirmed != true || !mounted) return;
     final removedMessage = tr(context, 'providers.providerRemoved');
+    final errorMessage = tr(context, 'common.errorGeneric');
     try {
       await ref.read(providersListProvider.notifier).delete(repo.id);
       _showMessage(removedMessage);
     } on RepoException catch (e) {
       _showMessage(e.message, isError: true);
+    } catch (_) {
+      _showMessage(errorMessage, isError: true);
     }
   }
 
   Future<void> _toggleRepo(ProviderRepo repo, bool enabled) async {
+    final errorMessage = tr(context, 'common.errorGeneric');
     try {
       await ref.read(providersListProvider.notifier).toggle(repo.id, enabled);
     } on RepoException catch (e) {
       _showMessage(e.message, isError: true);
+    } catch (_) {
+      _showMessage(errorMessage, isError: true);
     }
   }
 

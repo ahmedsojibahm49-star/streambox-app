@@ -176,8 +176,11 @@ class _MangaScreenState extends ConsumerState<MangaScreen> {
                     child: _genreDropdown(sortedGenres),
                   ),
                   const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: _openSortSheet,
+                  // FocusableCard (not a bare GestureDetector) so the
+                  // sort control is reachable by D-pad on Android TV.
+                  FocusableCard(
+                    onPressed: _openSortSheet,
+                    borderRadius: AppColors.radiusM,
                     child: Container(
                       height: 48,
                       padding:

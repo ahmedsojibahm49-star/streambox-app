@@ -7,6 +7,14 @@ name: Build APK
 #
 # To publish a release: git tag v1.0.0 && git push origin v1.0.0
 #
+# RELEASE SIGNING: if the four ANDROID_* repository secrets are set
+# (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS,
+# ANDROID_KEY_PASSWORD — see android/keystore-passwords.txt in the project
+# ZIP, never committed), the APK is signed with the release key. Without
+# them the build still succeeds and signs with the debug keys (with a
+# warning) — a debug-signed APK triggers stronger Play Protect warnings
+# on install, so set the secrets up for published releases.
+#
 # NOTE: this workflow does NOT run build_runner. Hive adapters (*.g.dart) are
 # committed to the repo; if a workstream adds a model or a HiveField without
 # regenerating (`dart run build_runner build --delete-conflicting-outputs`),
@@ -47,6 +55,26 @@ jobs:
 
       - name: Test
         run: flutter test
+
+      - name: Set up release signing (optional)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::warning::Release signing secrets are not configured — the APK will be signed with debug keys (stronger Play Protect warnings on install)."
+            exit 0
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/streambox-release.keystore
+          cat > android/key.properties <<PROPS_EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=../streambox-release.keystore
+          PROPS_EOF
+          echo "Release signing configured."
 
       - name: Build release APK
         run: flutter build apk --release

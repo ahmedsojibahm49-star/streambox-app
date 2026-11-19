@@ -639,6 +639,21 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     );
   }
 
+  /// Evict one page from the image cache so a retry re-downloads it.
+  /// Guarded: evictFromCache is async cache I/O and the retry button
+  /// fires it unawaited — a throw used to be an unhandled async error.
+  /// The index is re-checked because the chapter may have changed since
+  /// the page was built.
+  void _evictPage(int index) {
+    if (index < 0 || index >= _pageUrls.length) return;
+    final url = _pageUrls[index];
+    unawaited(Future(() async {
+      try {
+        await CachedNetworkImage.evictFromCache(url);
+      } catch (_) {}
+    }));
+  }
+
   Widget _buildPageMode() {
     return PageView.builder(
       controller: _pageController,
@@ -651,7 +666,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         url: _pageUrls[index],
         fit: BoxFit.contain,
         onRetry: () {
-          unawaited(CachedNetworkImage.evictFromCache(_pageUrls[index]));
+          _evictPage(index);
           setState(() {
             _pageRetryNonce[index] = (_pageRetryNonce[index] ?? 0) + 1;
           });
@@ -672,7 +687,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         url: _pageUrls[index],
         fit: BoxFit.fitWidth,
         onRetry: () {
-          unawaited(CachedNetworkImage.evictFromCache(_pageUrls[index]));
+          _evictPage(index);
           setState(() {
             _pageRetryNonce[index] = (_pageRetryNonce[index] ?? 0) + 1;
           });

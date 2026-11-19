@@ -234,6 +234,16 @@ class ProfileScreen extends ConsumerWidget {
             danger: true,
             onTap: () => _confirmSignOut(context, ref),
           ),
+          // Delete account (audit fix, Nov 19): the service method and
+          // the i18n strings already existed, but no screen ever called
+          // them — the feature was unreachable.
+          _row(
+            context,
+            icon: Iconsax.trash,
+            label: tr(context, 'auth.deleteAccount'),
+            danger: true,
+            onTap: () => _confirmDeleteAccount(context, ref),
+          ),
         ],
       ),
     );
@@ -345,7 +355,18 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(tr(context, 'profile.developer')),
-        content: Text(tr(context, 'profile.developerName')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 40,
+              backgroundImage:
+                  AssetImage('assets/images/developer_photo.jpg'),
+            ),
+            const SizedBox(height: 12),
+            Text(tr(context, 'profile.developerName')),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -385,6 +406,48 @@ class ProfileScreen extends ConsumerWidget {
     } catch (_) {
       if (context.mounted) {
         showSnack(context, tr(context, 'profile.signOutFailed'));
+      }
+    }
+  }
+
+  /// Delete the account after an explicit confirmation. Wipes the
+  /// profile, credentials, library and history from this device (see
+  /// [LocalAuthService.deleteAccount]); the providers/catalog stay —
+  /// they are not account data. The router redirect sends the user to
+  /// /welcome once the session is flipped off.
+  Future<void> _confirmDeleteAccount(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr(context, 'auth.deleteAccount')),
+        content: Text(tr(context, 'auth.deleteAccountConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(tr(context, 'common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              tr(context, 'common.delete'),
+              style: const TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      await ref.read(authServiceProvider).deleteAccount();
+      if (!context.mounted) return;
+      showSnack(context, tr(context, 'auth.accountDeleted'));
+      ref.read(authStateProvider.notifier).setLoggedIn(false);
+    } catch (_) {
+      if (context.mounted) {
+        showSnack(context, tr(context, 'common.errorGeneric'));
       }
     }
   }

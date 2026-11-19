@@ -254,9 +254,11 @@ flutter build apk --release
 # → build/app/outputs/flutter-apk/app-release.apk
 ```
 
-Copy that file to your phone and install it. This is a debug-signed release
-APK — good for personal use and testing, not for the Play Store (a Play
-Store release needs a signing keystore and an AAB: `flutter build appbundle`).
+Copy that file to your phone and install it. Without a `key.properties`
+file this is a **debug-signed** release APK — good for personal use and
+testing. For a release-signed APK (fewer install warnings), see
+[Release signing](#release-signing) below. A Play Store release needs an
+AAB instead: `flutter build appbundle`.
 
 ### 4. Web preview
 
@@ -282,6 +284,68 @@ The workflow (`.github/workflows/build-apk.yml`) runs `flutter pub get`,
 `flutter analyze`, `flutter test`, then `flutter build apk --release`.
 **The first run needs no secrets** — there are no API keys in this project
 at all, so nothing to configure.
+
+## Release signing
+
+APKs built without signing secrets use the **debug keys**, and Android /
+Play Protect warns aggressively when installing them. A release-signed
+APK (same code, signed with the project's release keystore) installs with
+a much lighter warning. The keystore already exists in this project
+(`android/streambox-release.keystore`) — it is **gitignored and travels
+in the ZIP only**, never in the repo.
+
+### One-time setup (GitHub Actions builds)
+
+`android/keystore-passwords.txt` (ZIP-only, never committed) holds the
+keystore alias, both passwords, the base64 of the keystore, and the exact
+steps. In short — in your GitHub repo, go to **Settings → Secrets and
+variables → Actions → New repository secret** and add these four:
+
+| Secret name | Value (from `keystore-passwords.txt`) |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | the base64 blob (one long line) |
+| `ANDROID_KEYSTORE_PASSWORD` | the store password |
+| `ANDROID_KEY_ALIAS` | `streambox` |
+| `ANDROID_KEY_PASSWORD` | the key password |
+
+The next workflow run signs the APK with the release key. If any secret
+is missing, the workflow still succeeds and falls back to debug signing
+with a warning — the build never fails on signing.
+
+### Local release-signed builds
+
+Create `android/key.properties` (gitignored) next to the keystore:
+
+```properties
+storePassword=<the store password>
+keyPassword=<the key password>
+keyAlias=streambox
+storeFile=../streambox-release.keystore
+```
+
+Then `flutter build apk --release` signs with the release key.
+
+### Rotating the key
+
+If the keystore or its passwords ever leak, generate a new one and update
+the secrets + `keystore-passwords.txt`:
+
+```bash
+keytool -genkeypair -v -keystore android/streambox-release.keystore \
+  -alias streambox -keyalg RSA -keysize 2048 -validity 10000
+```
+
+**Warning:** Android treats a new signing key as a *different app* — users
+must uninstall the old APK before installing one signed with a new key.
+Keep a safe backup of the keystore and its passwords; if the keystore is
+lost, future updates can never be installed over the old app.
+
+### Honest note about install warnings
+
+A sideloaded APK (installed from a file, not from the Play Store) **always**
+shows Android's "unknown sources" prompt — that is Android itself, and no
+signing setup removes it. Release signing reduces the extra Play Protect
+warning; only Play Store distribution removes install warnings entirely.
 
 ## Android TV notes
 
@@ -340,7 +404,7 @@ tokens.
 ## Honest limits (please read before judging it on a phone)
 
 - **No device test has been done anywhere yet.** The app is verified by
-  `flutter analyze` (0 issues), 101 passing tests and a release web build.
+  `flutter analyze` (0 issues), 117 passing tests and a release web build.
   The first real run on a phone may surface layout, playback or storage
   issues — that is the next step.
 - **The web build is a compile check only** — it proves the app builds and
@@ -363,7 +427,23 @@ tokens.
 - **Startup is hardened against white screens** — if local storage cannot
   start, the app shows a branded error screen with a Retry button instead
   of a blank screen; the splash session check has an 8s timeout per step,
-  so a hanging secure-storage read can never strand the app.
+  so a hanging secure-storage read can never strand the app. Hive init
+  tries pure-Dart direct Android app-data paths first (no platform
+  channel — this is what saves a device whose whole path_provider layer
+  is broken, as seen on v1.0.2), then the documents, support, temp and
+  cache directories; the error screen shows the full error with a Copy
+  button.
+- **Auth survives a broken KeyStore** — credentials normally live in
+  flutter_secure_storage; if secure storage throws on a device, sign-up,
+  login, session and onboarding fall back to a dedicated `authFallback`
+  Hive box (`ResilientCredentialStorage`). The fallback holds the same
+  salted SHA-256 hashes — never a plaintext password or code — so the
+  only thing that degrades is the container (a plain Hive file instead of
+  the OS keystore), and only on devices whose keystore is already broken.
+  On a healthy device the fallback box stays empty.
+- **Sideloaded APKs always show Android's "unknown sources" prompt** —
+  release signing (see above) reduces the extra Play Protect warning, but
+  only Play Store distribution removes install warnings entirely.
 - **No screenshot/widget tests for most screens** — widget tests cover
   shared components plus the full-app startup path
   (`test/startup*.dart`: boot, splash, routing, secure-storage failure

@@ -70,8 +70,10 @@ class AuthStateNotifier extends Notifier<bool> {
 /// Auth interface. Implemented by [LocalAuthService].
 ///
 /// All data is local: the profile lives in the `profile` Hive box, the
-/// password hash + device-code hash live in flutter_secure_storage. There
-/// is NO server, NO demo account, NO third-party auth.
+/// password hash + device-code hash live in flutter_secure_storage, with
+/// a Hive fallback box when secure storage throws on a device (see
+/// [ResilientCredentialStorage]). There is NO server, NO demo account, NO
+/// third-party auth.
 ///
 /// Flow: sign-up generates the device code (shown once in the popup) and
 /// stores the account WITHOUT starting a session; the user then logs in
@@ -147,16 +149,21 @@ abstract class AuthService {
 /// (salt + password) with a random 16-byte salt; the device code is
 /// stored as a plain SHA-256 hash (12 chars × 5 bits of entropy). Neither
 /// plaintext ever touches disk.
+///
+/// The default credential store is [ResilientCredentialStorage]:
+/// flutter_secure_storage first, a Hive fallback box when secure storage
+/// throws on a device — without it, a broken KeyStore meant the user
+/// could never log in on that device (v1.0.2).
 class LocalAuthService implements AuthService {
   LocalAuthService({
     CredentialStorage? credentials,
     BackupService? backupService,
   })  : _credentials =
-            credentials ?? FlutterSecureCredentialStorage(),
+            credentials ?? ResilientCredentialStorage(),
         _backup = backupService ??
             BackupService(
               credentials:
-                  credentials ?? FlutterSecureCredentialStorage(),
+                  credentials ?? ResilientCredentialStorage(),
             );
 
   final CredentialStorage _credentials;
@@ -181,7 +188,13 @@ class LocalAuthService implements AuthService {
       email: email.trim().toLowerCase(),
       createdAt: DateTime.now(),
     );
-    await _profileBox.put('current', profile);
+    // Credentials FIRST, profile LAST (audit fix, Nov 19): the old order
+    // wrote the profile first, so a credential-write failure left a
+    // half-created account — the profile existed (blocking a re-sign-up
+    // with `auth.errorAccountExists`) but no password/code hash existed,
+    // so login could never succeed either. With this order a failure
+    // leaves no profile behind and sign-up can simply be retried (the
+    // orphaned hashes are overwritten by the retry).
     await _credentials.write(
       CredentialKeys.passwordSalt,
       salt,
@@ -191,6 +204,7 @@ class LocalAuthService implements AuthService {
       _hashPassword(password, salt),
     );
     await _credentials.write(CredentialKeys.codeHash, _hashCode(code));
+    await _profileBox.put('current', profile);
     // No session yet: the user logs in with the code after the popup.
     return SignUpResult(profile: profile, deviceCode: code);
   }
@@ -243,9 +257,10 @@ class LocalAuthService implements AuthService {
       final session = await _credentials.read(CredentialKeys.sessionActive);
       return session == '1';
     } catch (_) {
-      // Secure storage unreadable on this device (broken KeyStore) — treat
-      // as logged out instead of crashing startup. The user can log in
-      // again; if writes work, the session is stored normally.
+      // Defense-in-depth only: the resilient store already falls back to
+      // the Hive box and returns null on total failure, so this catch
+      // only fires for a custom CredentialStorage that throws. Treat as
+      // logged out instead of crashing startup.
       return false;
     }
   }
@@ -275,8 +290,8 @@ class LocalAuthService implements AuthService {
       if (storedHash == null) return false;
       return _hashCode(code) == storedHash;
     } catch (_) {
-      // Secure storage unreadable — report the code as wrong instead of
-      // crashing the login flow.
+      // Defense-in-depth only (see isLoggedIn) — report the code as wrong
+      // instead of crashing the login flow.
       return false;
     }
   }
@@ -287,8 +302,9 @@ class LocalAuthService implements AuthService {
       final seen = await _credentials.read(CredentialKeys.onboardingSeen);
       return seen == '1';
     } catch (_) {
-      // Secure storage unreadable — show onboarding instead of crashing
-      // startup. The flag is re-written when onboarding finishes.
+      // Defense-in-depth only (see isLoggedIn) — show onboarding instead
+      // of crashing startup. The flag is re-written when onboarding
+      // finishes.
       return false;
     }
   }
