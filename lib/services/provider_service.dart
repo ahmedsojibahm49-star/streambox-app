@@ -36,23 +36,68 @@ class ParsedRepo {
 /// cached in the `catalog` box. NO binary index files, NO extension APKs, NO
 /// scraping, NO video-URL extraction. See CONTRACT.md hard boundaries.
 ///
+/// One JSON file may hold ONE catalog or SEVERAL (v1.0.4, multi-catalog):
+///
+///   - single catalog: `{"name": "...", "items": [...]}`
+///   - multi-catalog object: `{"providers": [{"name": "...", "items": [...]},
+///     {"name": "...", "items": [...]}]}`
+///   - top-level array: `[{"name": "...", "items": [...]}, {...}]`
+///
+/// Each catalog becomes its OWN repo row (own id / name / items) that the
+/// user can enable/disable/delete individually. A single-catalog file keeps
+/// the exact repo id it always had, so library entries and history survive.
+/// In a multi-catalog file the FIRST catalog keeps the base id and later
+/// ones get `-2`, `-3`, … suffixes, so a file that grows from one catalog
+/// to several keeps the first catalog's id too.
+///
 /// Implemented by the PROVIDERS-DATA workstream (real Hive + http impl).
 abstract class ProviderService {
   /// Fetch + parse a repo JSON from [sourceUrl] and cache its items.
   /// Returns the repo row (created or updated). Throws [RepoException]
   /// with a user-facing message on network/timeout/HTTP/validation errors.
+  ///
+  /// Multi-catalog files persist EVERY catalog; this returns the first
+  /// repo only. Prefer [fetchRepos] when the caller needs all of them.
   Future<ProviderRepo> fetchRepo(String sourceUrl);
+
+  /// Fetch + parse a repo JSON from [sourceUrl] and cache its items.
+  /// Returns one repo row per catalog in the file (one for a
+  /// single-catalog file, several for a multi-catalog file). Catalogs
+  /// that disappeared from the file since the last fetch are removed.
+  /// Throws [RepoException] with a user-facing message on
+  /// network/timeout/HTTP/validation errors.
+  Future<List<ProviderRepo>> fetchRepos(String sourceUrl);
 
   /// Parse raw repo JSON into items for [providerId]. Pure — no I/O.
   /// Throws [RepoException] when the JSON is not a valid catalog.
+  ///
+  /// Single-catalog only (legacy signature); multi-catalog files must go
+  /// through [parseRepoDocuments].
   List<ProviderItem> parseRepo(String rawJson, String providerId);
 
   /// Parse raw repo JSON into a repo row + items. Pure — no I/O.
   /// The repo row carries [providerId]/[sourceUrl]; callers persist it.
   /// Throws [RepoException] with a specific message on any invalid field.
+  ///
+  /// Single-catalog only (legacy signature); multi-catalog files must go
+  /// through [parseRepoDocuments].
   ParsedRepo parseRepoDocument(
     String rawJson, {
     required String providerId,
+    required String sourceUrl,
+  });
+
+  /// Parse raw repo JSON into one [ParsedRepo] per catalog in the file.
+  /// Pure — no I/O. Accepts a single-catalog object, a
+  /// `{"providers": [...]}` object, or a top-level array of catalog
+  /// objects. Repo ids derive from [providerIdBase]: the first (or only)
+  /// catalog keeps the base id, later ones get `-2`, `-3`, … suffixes.
+  /// All repos share [sourceUrl]. Throws [RepoException] with a specific
+  /// message on any invalid field; in a multi-catalog file the message
+  /// names which catalog failed (e.g. `Provider #2 is missing a "name"`).
+  List<ParsedRepo> parseRepoDocuments(
+    String rawJson, {
+    required String providerIdBase,
     required String sourceUrl,
   });
 
@@ -62,16 +107,30 @@ abstract class ProviderService {
 
   /// Re-fetch one repo and update its cached items + [ProviderRepo] row.
   /// Built-in repos re-seed from the bundled sample data; pasted repos
-  /// cannot be refreshed (throws [RepoException]).
+  /// cannot be refreshed (throws [RepoException]). For a repo that came
+  /// from a multi-catalog file, every catalog from that file is
+  /// re-synced (siblings included) and catalogs removed from the file
+  /// are dropped.
   Future<void> refreshRepo(ProviderRepo repo);
 
-  /// Re-fetch every enabled repo. Throws [RepoException] naming the repos
-  /// that failed, after attempting all of them.
+  /// Re-fetch every enabled repo. Each distinct source URL is fetched
+  /// once (multi-catalog siblings share one fetch). Throws
+  /// [RepoException] naming the repos that failed, after attempting all
+  /// of them.
   Future<void> refreshAll();
 
   /// Add a repo from pasted JSON text (no URL). The repo is stored with a
   /// `pasted://` source URL and cannot be refreshed later.
+  ///
+  /// Multi-catalog input persists EVERY catalog; this returns the first
+  /// repo only. Prefer [addReposFromJson] when the caller needs all of
+  /// them.
   Future<ProviderRepo> addRepoFromJson(String rawJson);
+
+  /// Add repo(s) from pasted JSON text (no URL). Returns one repo row per
+  /// catalog in the pasted JSON. Repos are stored with a `pasted://`
+  /// source URL and cannot be refreshed later.
+  Future<List<ProviderRepo>> addReposFromJson(String rawJson);
 
   /// Delete a repo and all its cached items. The built-in sample catalog
   /// cannot be deleted (throws [RepoException]).
@@ -126,20 +185,27 @@ class HiveProviderService implements ProviderService {
   /// Max episodes/chapters per item.
   static const int maxEpisodesPerItem = 1000;
 
+  /// Max catalogs in one multi-catalog file.
+  static const int maxCatalogsPerFile = 50;
+
   // -- Fetch ---------------------------------------------------------------
 
   @override
-  Future<ProviderRepo> fetchRepo(String sourceUrl) async {
+  Future<ProviderRepo> fetchRepo(String sourceUrl) async =>
+      (await fetchRepos(sourceUrl)).first;
+
+  @override
+  Future<List<ProviderRepo>> fetchRepos(String sourceUrl) async {
     final url = sourceUrl.trim();
     _validateRepoUrl(url);
     final rawJson = await _fetchRawJson(url);
-    final parsed = parseRepoDocument(
+    final parsed = parseRepoDocuments(
       rawJson,
-      providerId: _repoIdForUrl(url),
+      providerIdBase: _repoIdForUrl(url),
       sourceUrl: url,
     );
-    await _persistParsed(parsed, rawJson);
-    return parsed.repo;
+    await _persistAll(parsed, rawJson, sourceUrl: url);
+    return parsed.map((p) => p.repo).toList(growable: false);
   }
 
   @override
@@ -148,9 +214,9 @@ class HiveProviderService implements ProviderService {
       final url = sourceUrl.trim();
       _validateRepoUrl(url);
       final rawJson = await _fetchRawJson(url);
-      parseRepoDocument(
+      parseRepoDocuments(
         rawJson,
-        providerId: _repoIdForUrl(url),
+        providerIdBase: _repoIdForUrl(url),
         sourceUrl: url,
       );
       return true;
@@ -259,22 +325,206 @@ class HiveProviderService implements ProviderService {
     required String providerId,
     required String sourceUrl,
   }) {
-    final Object? decoded;
-    try {
-      decoded = jsonDecode(rawJson);
-    } on FormatException catch (e) {
-      throw RepoException(
-        'This file is not valid JSON (${e.message}). '
-        'Check the file for missing commas or brackets and try again.',
-      );
-    }
+    final decoded = _decodeJson(rawJson);
     if (decoded is! Map<String, dynamic>) {
       throw RepoException(
         'The repo file must be a JSON object with "name" and "items" — '
         'for example {"name": "My Catalog", "items": [...]}.',
       );
     }
+    return _parseSingleCatalog(
+      decoded,
+      providerId: providerId,
+      sourceUrl: sourceUrl,
+    );
+  }
 
+  @override
+  List<ParsedRepo> parseRepoDocuments(
+    String rawJson, {
+    required String providerIdBase,
+    required String sourceUrl,
+  }) {
+    final decoded = _decodeJson(rawJson);
+    final List<Object?> catalogs;
+    if (decoded is List) {
+      if (decoded.isEmpty) {
+        throw RepoException(
+          'This file is an empty list. Add at least one provider catalog, '
+          'for example [{"name": "My Catalog", "items": [...]}].',
+        );
+      }
+      _rejectExtensionIndex(decoded);
+      if (decoded.length > maxCatalogsPerFile) {
+        throw RepoException(
+          'This file has ${decoded.length} providers, but the limit is '
+          '$maxCatalogsPerFile providers per file.',
+        );
+      }
+      catalogs = decoded;
+    } else if (decoded is Map<String, dynamic>) {
+      if (decoded.containsKey('providers')) {
+        final providers = decoded['providers'];
+        if (providers is! List) {
+          throw RepoException(
+            'The "providers" field must be a list of catalog objects, for '
+            'example {"providers": [{"name": "My Catalog", "items": '
+            '[...]}]}.',
+          );
+        }
+        if (providers.isEmpty) {
+          throw RepoException(
+            'The "providers" list is empty. Add at least one provider '
+            'catalog.',
+          );
+        }
+        _rejectExtensionIndex(providers);
+        if (providers.length > maxCatalogsPerFile) {
+          throw RepoException(
+            'This file has ${providers.length} providers, but the limit is '
+            '$maxCatalogsPerFile providers per file.',
+          );
+        }
+        catalogs = providers;
+      } else if (decoded.containsKey('name') ||
+          decoded.containsKey('items')) {
+        // Single-catalog object.
+        catalogs = [decoded];
+      } else if (_looksLikeExtensionIndex(decoded)) {
+        throw _extensionIndexException();
+      } else {
+        throw RepoException(
+          'The repo file must be a JSON catalog with "name" and "items" — '
+          'for example {"name": "My Catalog", "items": [...]} — or a '
+          'multi-catalog file: {"providers": [{...}, {...}]} or a list of '
+          'catalogs [{...}, {...}].',
+        );
+      }
+    } else {
+      throw RepoException(
+        'The repo file must be a JSON catalog with "name" and "items" — '
+        'for example {"name": "My Catalog", "items": [...]} — or a '
+        'multi-catalog file: {"providers": [{...}, {...}]} or a list of '
+        'catalogs [{...}, {...}].',
+      );
+    }
+
+    final isMulti = catalogs.length > 1;
+    final parsed = <ParsedRepo>[];
+    for (var i = 0; i < catalogs.length; i++) {
+      final n = i + 1;
+      final rawCatalog = catalogs[i];
+      if (rawCatalog is! Map<String, dynamic>) {
+        if (isMulti) {
+          throw RepoException(
+            'Provider #$n is not an object. Each provider must look like '
+            '{"name": "...", "items": [...]}.',
+          );
+        }
+        throw RepoException(
+          'The repo file must be a JSON object with "name" and "items" — '
+          'for example {"name": "My Catalog", "items": [...]}.',
+        );
+      }
+      // First (or only) catalog keeps the base id; later catalogs get
+      // `-2`, `-3`, … so a file that grows from one catalog to several
+      // keeps the first catalog's id (library/history survive).
+      final providerId =
+          i == 0 ? providerIdBase : '$providerIdBase-${i + 1}';
+      if (!isMulti) {
+        parsed.add(
+          _parseSingleCatalog(
+            rawCatalog,
+            providerId: providerId,
+            sourceUrl: sourceUrl,
+          ),
+        );
+        continue;
+      }
+      // Multi-catalog: errors must name WHICH catalog failed.
+      final name = rawCatalog['name'];
+      if (name is! String || name.trim().isEmpty) {
+        throw RepoException(
+          'Provider #$n is missing a "name". Every provider in the file '
+          'needs its own name, for example "name": "My Catalog".',
+        );
+      }
+      final label = 'Provider #$n ("${name.trim()}")';
+      try {
+        parsed.add(
+          _parseSingleCatalog(
+            rawCatalog,
+            providerId: providerId,
+            sourceUrl: sourceUrl,
+          ),
+        );
+      } on RepoException catch (e) {
+        throw RepoException('$label: ${e.message}');
+      }
+    }
+    return parsed;
+  }
+
+  /// Decode repo JSON, tolerating a leading UTF-8 byte-order mark.
+  ///
+  /// BOM FIX (v1.0.4): `jsonDecode` REJECTS a leading U+FEFF, and Windows
+  /// Notepad saves UTF-8 files WITH a BOM by default — so a JSON file
+  /// written or edited in Notepad failed with "not valid JSON" even
+  /// though the JSON itself was fine. Strip it before decoding.
+  static Object? _decodeJson(String rawJson) {
+    var text = rawJson;
+    while (text.startsWith('\uFEFF')) {
+      text = text.substring(1);
+    }
+    try {
+      return jsonDecode(text);
+    } on FormatException catch (e) {
+      throw RepoException(
+        'This file is not valid JSON (${e.message}). '
+        'Check the file for missing commas or brackets and try again.',
+      );
+    }
+  }
+
+  /// True when [node] carries extension-index markers (`pkg` / `apk` /
+  /// `packageName` / `extensions` / `apps`) instead of catalog fields.
+  /// Aniyomi-style extension indexes list app packages, not titles.
+  static bool _looksLikeExtensionIndex(Map<String, dynamic> node) =>
+      node.containsKey('pkg') ||
+      node.containsKey('apk') ||
+      node.containsKey('packageName') ||
+      node.containsKey('extensions') ||
+      node.containsKey('apps');
+
+  /// Reject a list of catalogs when any entry looks like an extension
+  /// index. Extension indexes are out of scope (hard boundary) — the
+  /// error says so plainly instead of failing on a missing "items" list.
+  static void _rejectExtensionIndex(List<Object?> catalogs) {
+    for (final entry in catalogs) {
+      if (entry is Map<String, dynamic> &&
+          _looksLikeExtensionIndex(entry)) {
+        throw _extensionIndexException();
+      }
+    }
+  }
+
+  static RepoException _extensionIndexException() => RepoException(
+        'This file looks like an extension index — it lists app packages, '
+        'not titles. StreamBox providers are JSON catalogs: each provider '
+        'needs a "name" and an "items" list of titles. Extension files are '
+        'not supported.',
+      );
+
+  /// Parse ONE catalog object into a repo row + items. Pure — no I/O.
+  /// Shared by the single-catalog entry point ([parseRepoDocument]) and
+  /// the multi-catalog parser ([parseRepoDocuments]); messages are the
+  /// original single-catalog messages, and the multi-catalog parser
+  /// prefixes them with `Provider #N ("Name"): ` when needed.
+  ParsedRepo _parseSingleCatalog(
+    Map<String, dynamic> decoded, {
+    required String providerId,
+    required String sourceUrl,
+  }) {
     final name = decoded['name'];
     if (name is! String || name.trim().isEmpty) {
       throw RepoException(
@@ -550,16 +800,24 @@ class HiveProviderService implements ProviderService {
   // -- Repo management -----------------------------------------------------
 
   @override
-  Future<ProviderRepo> addRepoFromJson(String rawJson) async {
+  Future<ProviderRepo> addRepoFromJson(String rawJson) async =>
+      (await addReposFromJson(rawJson)).first;
+
+  @override
+  Future<List<ProviderRepo>> addReposFromJson(String rawJson) async {
     final digest = sha1.convert(utf8.encode(rawJson)).toString();
-    final providerId = 'pasted-${digest.substring(0, 12)}';
-    final parsed = parseRepoDocument(
+    final baseId = 'pasted-${digest.substring(0, 12)}';
+    // All catalogs from one paste share one source URL so re-pasting the
+    // same JSON updates them in place and stale-sibling cleanup groups
+    // them (same as a multi-catalog URL file).
+    final sourceUrl = 'pasted://$baseId';
+    final parsed = parseRepoDocuments(
       rawJson,
-      providerId: providerId,
-      sourceUrl: 'pasted://$providerId',
+      providerIdBase: baseId,
+      sourceUrl: sourceUrl,
     );
-    await _persistParsed(parsed, rawJson);
-    return parsed.repo;
+    await _persistAll(parsed, rawJson, sourceUrl: sourceUrl);
+    return parsed.map((p) => p.repo).toList(growable: false);
   }
 
   @override
@@ -641,18 +899,28 @@ class HiveProviderService implements ProviderService {
         'Remove it and add it again with the new JSON.',
       );
     }
-    await fetchRepo(repo.sourceUrl);
+    // fetchRepos re-syncs EVERY catalog from this URL, so refreshing one
+    // sibling of a multi-catalog file refreshes them all (and drops
+    // catalogs removed from the file).
+    await fetchRepos(repo.sourceUrl);
   }
 
   @override
   Future<void> refreshAll() async {
-    final failed = <String>[];
+    // Group by source URL: multi-catalog siblings share one file, so one
+    // fetch refreshes them all. Fetching per repo would download the
+    // same file once per sibling.
+    final bySourceUrl = <String, List<ProviderRepo>>{};
     for (final repo in listRepos()) {
       if (!repo.enabled) continue;
+      bySourceUrl.putIfAbsent(repo.sourceUrl, () => []).add(repo);
+    }
+    final failed = <String>[];
+    for (final entry in bySourceUrl.entries) {
       try {
-        await refreshRepo(repo);
+        await refreshRepo(entry.value.first);
       } on RepoException {
-        failed.add(repo.name);
+        failed.addAll(entry.value.map((repo) => repo.name));
       }
     }
     if (failed.isNotEmpty) {
@@ -703,6 +971,34 @@ class HiveProviderService implements ProviderService {
     final yearCompare = (b.year ?? 0).compareTo(a.year ?? 0);
     if (yearCompare != 0) return yearCompare;
     return a.title.compareTo(b.title);
+  }
+
+  /// Persist every parsed catalog from one file, then drop any repo rows
+  /// that came from the same [sourceUrl] but are no longer in the file
+  /// (e.g. a catalog was removed, or the file changed shape from
+  /// multi-catalog to single). Without the cleanup, a re-fetch would
+  /// leave stale rows whose items no longer exist upstream.
+  Future<void> _persistAll(
+    List<ParsedRepo> parsed,
+    String rawJson, {
+    required String sourceUrl,
+  }) async {
+    for (final repo in parsed) {
+      await _persistParsed(repo, rawJson);
+    }
+    final keepIds = {for (final repo in parsed) repo.repo.id};
+    final stale = _reposBox.values
+        .where(
+          (repo) =>
+              repo.sourceUrl == sourceUrl &&
+              !keepIds.contains(repo.id) &&
+              !repo.isBuiltIn,
+        )
+        .toList();
+    for (final repo in stale) {
+      await _deleteItemsForRepo(repo.id);
+      await _reposBox.delete(repo.id);
+    }
   }
 
   /// Persist a parsed repo: upsert the repo row (preserving the enabled

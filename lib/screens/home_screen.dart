@@ -90,6 +90,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
+              // v1.0.4: the header (with the search button) used to be
+              // missing entirely when the catalog was empty, so there
+              // was no top-bar search at all in that state.
+              _header(context, profile?.name),
               SizedBox(height: MediaQuery.sizeOf(context).height * 0.22),
               EmptyState(
                 title: tr(context, 'home.emptyTitle'),
@@ -231,9 +235,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
+            // v1.0.4: the search icon. This is NOT a colour bug — the
+            // colour binding (palette.text, near-white on dark /
+            // near-black on light) was already high-contrast in both
+            // themes. The glyph was the defect: Iconsax.search_normal
+            // is MALFORMED in iconsax_flutter 1.0.1 — both ring
+            // contours wind the same way, so with non-zero fill it
+            // renders as a solid disc + dot instead of a magnifier
+            // (verified against the font file and the v1.0.3 device
+            // screenshot, where the bottom-nav Search tab shows the
+            // same blob). search_normal_copy is the glyph that
+            // actually renders as a magnifier outline in this font
+            // build — in this package base names are Bold and `_copy`
+            // names are Linear, the opposite of the pubspec comment.
+            // Do NOT "fix" this back to search_normal.
             IconButton(
+              tooltip: tr(context, 'common.search'),
               icon: Icon(
-                Iconsax.search_normal,
+                Iconsax.search_normal_copy,
                 color: palette.text,
               ),
               onPressed: () => context.go('/search'),

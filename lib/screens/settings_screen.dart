@@ -26,16 +26,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  late bool _notificationsEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    final settings =
-        Hive.box<AppSettings>(BoxNames.settings).get('current');
-    _notificationsEnabled = settings?.notificationsEnabled ?? true;
-  }
-
   AppSettings _settings() {
     final box = Hive.box<AppSettings>(BoxNames.settings);
     return box.get('current') ?? AppSettings();
@@ -89,7 +79,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
       return;
     }
-    if (mounted) setState(() => _notificationsEnabled = value);
+    // No setState: the Switch reads the settings box through a
+    // ValueListenableBuilder, so the box write rebuilds it — and the
+    // switch can never go stale when the box changes elsewhere (e.g. a
+    // backup restore replacing the settings).
   }
 
   @override
@@ -210,10 +203,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
-                    Switch(
-                      value: _notificationsEnabled,
-                      activeThumbColor: AppColors.brand,
-                      onChanged: _setNotifications,
+                    // v1.0.4: read the toggle straight from the box so
+                    // it can never show a stale value (the old local
+                    // `_notificationsEnabled` was snapshotted once in
+                    // initState and missed later box writes, e.g. a
+                    // backup restore replacing the settings).
+                    ValueListenableBuilder<Box<AppSettings>>(
+                      valueListenable:
+                          Hive.box<AppSettings>(BoxNames.settings)
+                              .listenable(keys: const ['current']),
+                      builder: (context, box, _) {
+                        final enabled = box
+                                .get('current')
+                                ?.notificationsEnabled ??
+                            true;
+                        return Switch(
+                          value: enabled,
+                          activeThumbColor: AppColors.brand,
+                          onChanged: _setNotifications,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -247,7 +256,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             icon: Iconsax.code,
             label: tr(context, 'settings.developer'),
             trailing: tr(context, 'settings.developerName'),
-            onTap: () => _showDeveloper(context),
+            onTap: () => context.push('/developer'),
           ),
         ],
       ),
@@ -357,30 +366,4 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showDeveloper(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(tr(context, 'settings.developer')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(
-              radius: 40,
-              backgroundImage:
-                  AssetImage('assets/images/developer_photo.jpg'),
-            ),
-            const SizedBox(height: 12),
-            Text(tr(context, 'settings.developerName')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(tr(context, 'common.ok')),
-          ),
-        ],
-      ),
-    );
-  }
 }

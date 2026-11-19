@@ -17,6 +17,7 @@ import '../../services/library_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/focusable_card.dart';
+import '../../widgets/pause_bars.dart';
 import '../../widgets/player_controls.dart';
 import '../screen_helpers.dart';
 import 'player_logic.dart';
@@ -79,6 +80,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Timer? _progressTimer;
   Timer? _notFoundTimer;
 
+  /// History notifier, cached in [initState].
+  ///
+  /// [_saveProgress] runs from [dispose], where `ref` is unsafe —
+  /// Riverpod throws ("Using ref when a widget is about to or has been
+  /// unmounted") if `ref.read` is called during unmount, and that throw
+  /// aborted the rest of dispose (leaving the progress timer pending).
+  /// The notifier is long-lived, so caching it once is safe.
+  HistoryNotifier? _historyNotifier;
+
   List<Map<String, dynamic>> get _episodes => _item?.episodes ?? const [];
 
   Map<String, dynamic>? get _currentEpisode =>
@@ -94,6 +104,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   @override
   void initState() {
     super.initState();
+    // Cache the history notifier now: _saveProgress runs from dispose(),
+    // where ref.read is unsafe (see _historyNotifier).
+    _historyNotifier = ref.read(historyProvider.notifier);
     _keyParts = parseBoxKey(widget.itemId);
     if (_keyParts == null) {
       _initializing = false;
@@ -220,10 +233,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   int _resumeSecondsFor(Map<String, dynamic> episode) {
     final parts = _keyParts;
     if (parts == null) return 0;
-    final entry = ref.read(libraryServiceProvider).progressFor(
-          itemId: parts.itemId,
-          providerId: parts.providerId,
-        );
+    final entry = ref
+        .read(libraryServiceProvider)
+        .progressFor(itemId: parts.itemId, providerId: parts.providerId);
     if (entry == null) return 0;
     final number = episodeNumber(episode, fallback: _episodeIndex + 1);
     if (entry.episodeOrChapter != number) return 0;
@@ -248,13 +260,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     _videoController = controller;
     controller.addListener(_onVideoTick);
     try {
-      await controller.initialize();
+      // initialize() has no built-in timeout — a stalled network used to
+      // leave the spinner up forever (the silent 0:00 screen). 20s is
+      // generous for an HLS manifest + first segment even on a slow
+      // connection; on timeout the catch below shows the error state.
+      await controller.initialize().timeout(const Duration(seconds: 20));
     } catch (_) {
-      // Dispose the failed controller (it holds a platform texture even
-      // when initialize throws) before showing the error state.
-      try {
-        await controller.dispose();
-      } catch (_) {}
+      // Dispose the failed controller (it holds a platform texture when
+      // initialize got far enough to create one) before showing the error
+      // state — with a timeout, never a bare await (see
+      // [_disposeVideoController]).
+      await _disposeVideoController(controller);
       if (_videoController == controller) _videoController = null;
       if (!mounted) return;
       setState(() {
@@ -264,9 +280,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       return;
     }
     if (!mounted) {
-      try {
-        await controller.dispose();
-      } catch (_) {}
+      await _disposeVideoController(controller);
       return;
     }
     if (_videoController != controller) return; // superseded by a new load
@@ -278,13 +292,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     // seekTo / setPlaybackSpeed / play are platform-channel calls — any
     // of them can throw on a device with a broken plugin layer. The old
     // code awaited them unguarded, so a throw here was an unhandled async
-    // error (and the spinner never cleared).
+    // error (and the spinner never cleared). play() can also HANG on a
+    // dead plugin layer, so it gets the same timeout treatment as
+    // initialize() above.
     try {
       if (realResume > 0) {
         await controller.seekTo(Duration(seconds: realResume));
       }
       await controller.setPlaybackSpeed(_speed);
-      await controller.play();
+      await controller.play().timeout(const Duration(seconds: 10));
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -331,7 +347,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         if (duration > Duration.zero) _duration = duration;
         _isPlaying = value.playerState == PlayerState.playing;
         _ended = value.playerState == PlayerState.ended;
-        if (value.hasError) _error = 'player.videoFailed';
+        if (value.hasError) {
+          _error = 'player.videoFailed';
+          _initializing = false;
+        } else if (_initializing &&
+            (value.playerState != PlayerState.unknown ||
+                duration > Duration.zero)) {
+          // First real state from the player: the WebView is up and the
+          // video is loading/playing — the spinner can go. (The old code
+          // cleared _initializing synchronously in _loadYoutube, before
+          // the WebView had even started — the user saw 0:00/0:00 with
+          // no spinner and no error.)
+          _initializing = false;
+        }
         if (_isPlaying) {
           _initializing = false;
           _scheduleHide();
@@ -350,21 +378,46 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         _position = state.position;
         if (_duration > Duration.zero) {
           _buffered = Duration(
-            milliseconds:
-                (_duration.inMilliseconds * state.loadedFraction).round(),
+            milliseconds: (_duration.inMilliseconds * state.loadedFraction)
+                .round(),
           );
         }
       });
     });
 
-    // YouTube has no initialize future — clear the spinner once the first
-    // value arrives, or after a short grace period.
-    Future.delayed(const Duration(seconds: 2), () {
+    // YouTube has no initialize future — the spinner clears when the first
+    // real player state arrives (see the value listener above). If nothing
+    // arrives within the grace period the WebView never came up: show the
+    // error state (with its Retry button) instead of a silent black 0:00
+    // screen. The controller check makes a stale callback a no-op after a
+    // retry or episode switch.
+    Future.delayed(const Duration(seconds: 8), () {
       if (mounted && _ytController == controller && _initializing) {
-        setState(() => _initializing = false);
+        setState(() {
+          _initializing = false;
+          _error = 'player.videoFailed';
+        });
       }
     });
-    setState(() => _initializing = false);
+  }
+
+  /// Dispose a video controller, never hanging.
+  ///
+  /// video_player 2.14's `dispose()` awaits an internal completer that is
+  /// only completed when `createWithOptions` RETURNS — so after a
+  /// failed/hung initialize the dispose itself hangs forever and the
+  /// error state never appears (the silent spinner: init times out at
+  /// 20s, then the catch block blocks forever on dispose). A 2s timeout
+  /// keeps the load path moving; when create failed there is no platform
+  /// texture to clean up anyway.
+  static Future<void> _disposeVideoController(
+    VideoPlayerController controller,
+  ) async {
+    try {
+      await controller.dispose().timeout(const Duration(seconds: 2));
+    } catch (_) {
+      // Already dead / dispose hung — nothing left to clean up.
+    }
   }
 
   /// Every close/dispose is guarded: a controller whose platform side is
@@ -380,9 +433,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     _ytValueSub = null;
     _ytStateSub = null;
     _videoController?.removeListener(_onVideoTick);
-    try {
-      await _videoController?.dispose();
-    } catch (_) {}
+    final videoController = _videoController;
+    if (videoController != null) {
+      await _disposeVideoController(videoController);
+    }
     _videoController = null;
     try {
       await _ytController?.close();
@@ -397,7 +451,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     if (controller == null || !mounted) return;
     final value = controller.value;
     if (!value.isInitialized) return;
-    final ended = value.duration > Duration.zero &&
+    final ended =
+        value.duration > Duration.zero &&
         value.position >= value.duration &&
         !value.isPlaying;
     setState(() {
@@ -405,9 +460,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       _duration = value.duration;
       _buffered = value.buffered.isEmpty
           ? Duration.zero
-          : value.buffered
-              .map((r) => r.end)
-              .reduce((a, b) => a > b ? a : b);
+          : value.buffered.map((r) => r.end).reduce((a, b) => a > b ? a : b);
       _isPlaying = value.isPlaying;
       _ended = ended;
       if (value.hasError) _error = 'player.videoFailed';
@@ -490,7 +543,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   }
 
   void _playEpisode(int index) {
-    if (index == _episodeIndex || index < 0 || index >= _episodes.length) {
+    if (index < 0 || index >= _episodes.length) return;
+    if (index == _episodeIndex) {
+      // Tapping the current episode toggles play/pause (the row icon
+      // shows pause bars while playing, a play triangle while paused);
+      // on an errored episode it retries the load instead.
+      if (_error != null) {
+        _loadEpisode(index);
+        return;
+      }
+      _togglePlay();
       return;
     }
     _loadEpisode(index);
@@ -531,9 +593,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight,
         ]);
-        await SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.immersiveSticky,
-        );
+        await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       }
     } catch (_) {
       return;
@@ -562,16 +622,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   void _saveProgress() {
     final parts = _keyParts;
-    if (parts == null || _item == null) return;
+    final history = _historyNotifier;
+    if (parts == null || _item == null || history == null) return;
     final seconds = _ended ? 0 : _position.inSeconds;
-    // Fire-and-forget: progress must never break playback.
+    // Fire-and-forget: progress must never break playback. Uses the
+    // notifier cached in initState — never ref.read — because this runs
+    // from dispose(), where ref is unsafe.
     unawaited(
-      ref.read(historyProvider.notifier).record(
-            itemId: parts.itemId,
-            providerId: parts.providerId,
-            episodeOrChapter: _currentEpisodeNumber,
-            positionSeconds: seconds,
-          ),
+      history.record(
+        itemId: parts.itemId,
+        providerId: parts.providerId,
+        episodeOrChapter: _currentEpisodeNumber,
+        positionSeconds: seconds,
+      ),
     );
   }
 
@@ -585,8 +648,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     // plugin layer crashed the error overlay's fallback button.
     bool launched = false;
     try {
-      launched =
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
+      launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       launched = false;
     }
@@ -603,8 +665,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     // disappearing (repo removed mid-playback), or refreshing (repo
     // re-fetch updates metadata). State changes run post-frame so a
     // provider notification during build can't call setState mid-build.
-    ref.listen<ProviderItem?>(itemByIdProvider(widget.itemId),
-        (previous, next) {
+    ref.listen<ProviderItem?>(itemByIdProvider(widget.itemId), (
+      previous,
+      next,
+    ) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (next != null && _item == null) {
@@ -650,8 +714,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   }
 
   Widget _buildVideoArea() {
-    final isYoutube = _source.type == PlaybackSourceType.youtube &&
-        _ytController != null;
+    final isYoutube =
+        _source.type == PlaybackSourceType.youtube && _ytController != null;
     if (isYoutube && !kIsWeb) {
       // On mobile the YouTube WebView lives in an OverlayPortal ABOVE the
       // normal widget tree, so the tap layer + controls must be built inside
@@ -659,17 +723,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       // overlay in the outer Stack would sit underneath the WebView.
       return YoutubePlayer(
         controller: _ytController!,
-        builder: (context, player, _) =>
-            _buildStackedArea(videoChild: player),
+        builder: (context, player, _) => _buildStackedArea(videoChild: player),
       );
     }
     if (isYoutube && kIsWeb) {
       // On web, pointer events don't reach Flutter overlays through the
       // iframe, so YouTube's native controls stay (see the package docs).
       if (_error != null) {
-        return _buildStackedArea(
-          videoChild: const SizedBox.shrink(),
-        );
+        return _buildStackedArea(videoChild: const SizedBox.shrink());
       }
       return YoutubePlayer(controller: _ytController!);
     }
@@ -752,8 +813,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           child: Stack(
             children: [
               _buildTopBar(),
-              _buildCenterControls(),
-              _buildBottomControls(),
+              // While initializing the spinner owns the center — showing
+              // the play button + 0:00/0:00 seek bar on top of it was the
+              // confusing "loading but looks broken" state.
+              if (!_initializing) _buildCenterControls(),
+              if (!_initializing) _buildBottomControls(),
             ],
           ),
         ),
@@ -771,9 +835,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           });
     final subtitle = episode == null
         ? ''
-        : [episodeLabel, episodeTitle(episode)]
-            .where((s) => s.isNotEmpty)
-            .join(' · ');
+        : [
+            episodeLabel,
+            episodeTitle(episode),
+          ].where((s) => s.isNotEmpty).join(' · ');
     return Positioned(
       top: 0,
       left: 0,
@@ -803,18 +868,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                        ),
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: Colors.white),
                   ),
                   if (subtitle.isNotEmpty)
                     Text(
                       subtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white70,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(color: Colors.white70),
                     ),
                 ],
               ),
@@ -921,9 +984,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 child: Text(
                   '${speed}x',
                   style: TextStyle(
-                    color: speed == _speed
-                        ? AppColors.brand
-                        : Colors.white,
+                    color: speed == _speed ? AppColors.brand : Colors.white,
                     fontWeight: speed == _speed
                         ? FontWeight.w600
                         : FontWeight.w400,
@@ -958,61 +1019,74 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final canOpenBrowser = _source.browserUrl != null;
     return Container(
       color: Colors.black,
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.danger.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Iconsax.warning_2,
-              size: 32,
-              color: AppColors.danger,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            tr(context, 'common.error'),
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(color: Colors.white),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: Colors.white70),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildErrorAction(
-                label: tr(context, 'common.retry'),
-                icon: Iconsax.refresh,
-                onPressed: () => _loadEpisode(_episodeIndex),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Portrait video is only ~202px tall at 360px wide — the old
+          // 72px icon + full spacing overflowed the area (flex error in
+          // debug, clipped buttons in release). Compact mode shrinks
+          // everything; the scroll view is the last resort.
+          final compact = constraints.maxHeight < 280;
+          final iconCircle = compact ? 48.0 : 72.0;
+          final iconSize = compact ? 22.0 : 32.0;
+          return Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(compact ? 16 : 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: iconCircle,
+                    height: iconCircle,
+                    decoration: BoxDecoration(
+                      color: AppColors.danger.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Iconsax.warning_2,
+                      size: iconSize,
+                      color: AppColors.danger,
+                    ),
+                  ),
+                  SizedBox(height: compact ? 8 : 16),
+                  Text(
+                    tr(context, 'common.error'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(color: Colors.white70),
+                  ),
+                  SizedBox(height: compact ? 12 : 20),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      _buildErrorAction(
+                        label: tr(context, 'common.retry'),
+                        icon: Iconsax.refresh,
+                        height: compact ? 40 : 44,
+                        onPressed: () => _loadEpisode(_episodeIndex),
+                      ),
+                      if (canOpenBrowser)
+                        _buildErrorAction(
+                          label: tr(context, 'player.openInBrowser'),
+                          icon: Iconsax.export_1,
+                          height: compact ? 40 : 44,
+                          onPressed: _openInBrowser,
+                        ),
+                    ],
+                  ),
+                ],
               ),
-              if (canOpenBrowser) ...[
-                const SizedBox(width: 12),
-                _buildErrorAction(
-                  label: tr(context, 'player.openInBrowser'),
-                  icon: Iconsax.export_1,
-                  onPressed: _openInBrowser,
-                ),
-              ],
-            ],
-          ),
-        ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -1021,12 +1095,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     required String label,
     required IconData icon,
     required VoidCallback onPressed,
+    double height = 44,
   }) {
     return FocusableCard(
       onPressed: onPressed,
       borderRadius: 999,
       child: Container(
-        height: 44,
+        height: height,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
@@ -1058,68 +1133,69 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       child: Container(
         color: Colors.black.withValues(alpha: 0.75),
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              tr(context, 'player.upNext'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tr(context, 'player.upNext'),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: AppColors.brandSoft,
                     letterSpacing: 1.2,
                   ),
-            ),
-            const SizedBox(height: 12),
-            if (nextIndex != null) ...[
-              Text(
-                trParams(context, 'player.episode', {
-                  'number': episodeNumber(
-                    _episodes[nextIndex],
-                    fallback: nextIndex + 1,
-                  ).toString(),
-                }),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
-              if (episodeTitle(_episodes[nextIndex]).isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  episodeTitle(_episodes[nextIndex]),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white70,
-                      ),
                 ),
-              ],
-              const SizedBox(height: 20),
-              _buildErrorAction(
-                label: tr(context, 'common.play'),
-                icon: Iconsax.play_copy,
-                onPressed: () => _playEpisode(nextIndex),
-              ),
-            ] else ...[
-              Text(
-                tr(context, 'player.noMoreEpisodes'),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                const SizedBox(height: 12),
+                if (nextIndex != null) ...[
+                  Text(
+                    trParams(context, 'player.episode', {
+                      'number': episodeNumber(
+                        _episodes[nextIndex],
+                        fallback: nextIndex + 1,
+                      ).toString(),
+                    }),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium
+                        ?.copyWith(color: Colors.white),
+                  ),
+                  if (episodeTitle(_episodes[nextIndex]).isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      episodeTitle(_episodes[nextIndex]),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: Colors.white70),
                     ),
-              ),
-              const SizedBox(height: 20),
-              _buildErrorAction(
-                label: tr(context, 'player.replay'),
-                icon: Iconsax.refresh,
-                onPressed: () async {
-                  await _seekTo(Duration.zero);
-                  setState(() => _ended = false);
-                  await _togglePlay();
-                },
-              ),
-            ],
-          ],
+                  ],
+                  const SizedBox(height: 20),
+                  _buildErrorAction(
+                    label: tr(context, 'common.play'),
+                    icon: Iconsax.play_copy,
+                    onPressed: () => _playEpisode(nextIndex),
+                  ),
+                ] else ...[
+                  Text(
+                    tr(context, 'player.noMoreEpisodes'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: Colors.white),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildErrorAction(
+                    label: tr(context, 'player.replay'),
+                    icon: Iconsax.refresh,
+                    onPressed: () async {
+                      await _seekTo(Duration.zero);
+                      setState(() => _ended = false);
+                      await _togglePlay();
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -1135,8 +1211,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         onPressed: () => _playEpisode(nextIndex),
         borderRadius: 12,
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: const Color(0xE61C1C22),
             borderRadius: BorderRadius.circular(12),
@@ -1148,12 +1223,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
               const SizedBox(width: 8),
               Text(
                 '${tr(context, 'player.upNext')}: '
-                '${trParams(context, 'player.episode', {
-                  'number': episodeNumber(
-                    _episodes[nextIndex],
-                    fallback: nextIndex + 1,
-                  ).toString(),
-                })}',
+                '${trParams(context, 'player.episode', {'number': episodeNumber(_episodes[nextIndex], fallback: nextIndex + 1).toString()})}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -1169,16 +1239,52 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   Widget _buildEpisodeList() {
     final palette = context.palette;
+    final episode = _currentEpisode;
+    final episodeLabel = episode == null
+        ? ''
+        : trParams(context, 'player.episode', {
+            'number': _currentEpisodeNumber.toString(),
+          });
+    final subtitle = episode == null
+        ? ''
+        : [
+            episodeLabel,
+            episodeTitle(episode),
+          ].where((s) => s.isNotEmpty).join(' · ');
     return Container(
       color: palette.bg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title + current episode, always visible below the video (the
+          // top bar hides with the controls; Figma P01 shows the same
+          // title/meta block under the player).
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Text(
+              _item?.title ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          if (subtitle.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 2, 16, 0),
+              child: Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: palette.muted),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               tr(context, 'player.episodes'),
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleSmall
+                  ?.copyWith(color: palette.muted),
             ),
           ),
           Expanded(
@@ -1189,8 +1295,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
               itemBuilder: (context, index) {
                 final episode = _episodes[index];
                 final isCurrent = index == _episodeIndex;
-                final number =
-                    episodeNumber(episode, fallback: index + 1);
+                final number = episodeNumber(episode, fallback: index + 1);
                 final durationSeconds = episodeDurationSeconds(episode);
                 return FocusableCard(
                   onPressed: () => _playEpisode(index),
@@ -1204,12 +1309,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       color: isCurrent
                           ? AppColors.brand.withValues(alpha: 0.12)
                           : palette.card,
-                      borderRadius:
-                          BorderRadius.circular(AppColors.radiusM),
+                      borderRadius: BorderRadius.circular(AppColors.radiusM),
                       border: Border.all(
-                        color: isCurrent
-                            ? AppColors.brand
-                            : palette.border,
+                        color: isCurrent ? AppColors.brand : palette.border,
                       ),
                     ),
                     child: Row(
@@ -1221,21 +1323,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                             gradient: isCurrent
                                 ? AppColors.primaryGradient
                                 : null,
-                            color: isCurrent
-                                ? null
-                                : palette.bg,
+                            color: isCurrent ? null : palette.bg,
                             shape: BoxShape.circle,
                           ),
                           alignment: Alignment.center,
-                          child: Icon(
-                            isCurrent
-                                ? Iconsax.pause_copy
-                                : Iconsax.play_copy,
-                            size: 18,
-                            color: isCurrent
-                                ? Colors.white
-                                : palette.text,
-                          ),
+                          // Pause is two clean drawn bars, never the
+                          // Iconsax pause glyph — at 18px the glyph's
+                          // fat rounded bars read as "00". The bars show
+                          // only while actually playing; a paused current
+                          // episode shows the play triangle (tapping the
+                          // row resumes it).
+                          child: isCurrent && _isPlaying
+                              ? const PauseBars(height: 18, color: Colors.white)
+                              : Icon(
+                                  Iconsax.play_copy,
+                                  size: 18,
+                                  color: isCurrent
+                                      ? Colors.white
+                                      : palette.text,
+                                ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -1246,9 +1352,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                 trParams(context, 'player.episode', {
                                   'number': number.toString(),
                                 }),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
+                                style: Theme.of(context).textTheme.titleSmall
                                     ?.copyWith(
                                       color: isCurrent
                                           ? AppColors.brand
@@ -1260,9 +1364,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                   episodeTitle(episode),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                             ],
                           ),
@@ -1270,17 +1372,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                         if (durationSeconds > 0)
                           Text(
                             Formatters.duration(durationSeconds),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall,
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
-                        if (isCurrent) ...[
+                        // "Now playing" only when playback has actually
+                        // started — the old code showed it for the
+                        // current episode even while the video sat at
+                        // 0:00/0:00 still loading (or failed).
+                        if (isCurrent && _isPlaying) ...[
                           const SizedBox(width: 8),
                           Text(
                             tr(context, 'player.nowPlaying'),
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
+                            style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(color: AppColors.brand),
                           ),
                         ],

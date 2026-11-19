@@ -59,7 +59,7 @@ class _SearchFieldState extends State<SearchField> {
       decoration: InputDecoration(
         hintText: tr(context, widget.hintKey),
         prefixIcon: Icon(
-          Iconsax.search_normal,
+          Iconsax.search_normal_copy,
           size: 20,
           color: palette.muted,
         ),

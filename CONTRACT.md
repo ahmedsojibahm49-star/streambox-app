@@ -254,6 +254,8 @@ Java 17 → Flutter stable → pub get → analyze → test → `flutter build a
    screens workstream owns them per the coordinator's assignment.)
    (Update 2026-11-19, providers-data: `/settings/providers` and
    `/settings/providers/add` are now real screens.)
+   (Update 2026-11-19, v1.0.4: all 17 routes are real screens, including
+   the new `/developer` page.)
 2. `AuthService` / `ProviderService` are throwing stubs.
    (Update 2026-11-19, auth: `AuthService` is fully implemented
    (`LocalAuthService`); `ProviderService` is still a stub.)

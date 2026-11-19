@@ -384,7 +384,7 @@ warning; only Play Store distribution removes install warnings entirely.
 ```bash
 flutter pub get          # install dependencies
 flutter analyze          # must be 0 issues
-flutter test             # 101 tests (unit + widget)
+flutter test             # 163 tests (unit + widget)
 flutter build web --release   # smoke build (delete build/ after)
 ```
 
@@ -404,7 +404,7 @@ tokens.
 ## Honest limits (please read before judging it on a phone)
 
 - **No device test has been done anywhere yet.** The app is verified by
-  `flutter analyze` (0 issues), 117 passing tests and a release web build.
+  `flutter analyze` (0 issues), 163 passing tests and a release web build.
   The first real run on a phone may surface layout, playback or storage
   issues — that is the next step.
 - **The web build is a compile check only** — it proves the app builds and

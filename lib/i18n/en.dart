@@ -45,8 +45,7 @@ const Map<String, String> enStrings = {
 
   // Auth
   'auth.welcomeTitle': 'Your shows, your way',
-  'auth.welcomeSubtitle':
-      'Anime, movies, manga and manhwa from your own providers — all in one place, all offline-first.',
+  'auth.welcomeSubtitle': 'Anime, movies, manga and manhwa from your own providers — all in one place, all offline-first.',
   'auth.login': 'Log in',
   'auth.signup': 'Sign up',
   'auth.logout': 'Log out',
@@ -62,8 +61,7 @@ const Map<String, String> enStrings = {
   'auth.loginTitle': 'Welcome back',
   'auth.signupTitle': 'Create your account',
   'auth.codeTitle': 'Your device code',
-  'auth.codeSubtitle':
-      'This code unlocks your account on this device. Keep it safe — you need it to log in.',
+  'auth.codeSubtitle': 'This code unlocks your account on this device. Keep it safe — you need it to log in.',
   'auth.codeHint': 'SB-XXXX-XXXX-XXXX',
   'auth.codeInvalid': 'That code doesn’t look right',
   'auth.codeCopied': 'Code copied',
@@ -83,8 +81,7 @@ const Map<String, String> enStrings = {
   'auth.errorAccountExists':
       'An account already exists on this device. Log in instead.',
   'auth.iSavedMyCode': 'I saved my code',
-  'auth.forgotCodeHint':
-      'Your code was shown once when you signed up. Check where you saved it — without it, you can’t log in or restore a backup.',
+  'auth.forgotCodeHint': 'Your code was shown once when you signed up. Check where you saved it — without it, you can’t log in or restore a backup.',
   'auth.showPassword': 'Show password',
   'auth.hidePassword': 'Hide password',
   'auth.signupSubtitle':
@@ -94,8 +91,7 @@ const Map<String, String> enStrings = {
   'auth.loginSuccessBody': 'Signed in as {name}.',
   'auth.checkingSession': 'Checking your session…',
   'auth.deleteAccount': 'Delete account',
-  'auth.deleteAccountConfirm':
-      'Delete your account and all its data on this device? Your library, history and profile will be gone for good.',
+  'auth.deleteAccountConfirm': 'Delete your account and all its data on this device? Your library, history and profile will be gone for good.',
   'auth.accountDeleted': 'Account deleted.',
   'auth.creatingAccount': 'Creating account…',
   'auth.loggingIn': 'Logging in…',
@@ -103,14 +99,11 @@ const Map<String, String> enStrings = {
 
   // Onboarding
   'onboarding.slide1Title': 'Everything you love, one app',
-  'onboarding.slide1Body':
-      'Anime, movies, manga and manhwa — stream and read without switching apps.',
+  'onboarding.slide1Body': 'Anime, movies, manga and manhwa — stream and read without switching apps.',
   'onboarding.slide2Title': 'Your providers, your catalog',
-  'onboarding.slide2Body':
-      'Add JSON catalog repos and browse them together. No account on any server.',
+  'onboarding.slide2Body': 'Add JSON catalog repos and browse them together. No account on any server.',
   'onboarding.slide3Title': 'Private by design',
-  'onboarding.slide3Body':
-      'Your library, history and backups stay on your device. You hold the key.',
+  'onboarding.slide3Body': 'Your library, history and backups stay on your device. You hold the key.',
 
   // Home
   'home.title': 'Home',
@@ -123,8 +116,7 @@ const Map<String, String> enStrings = {
   'home.myList': 'My List',
   'home.becauseYouWatched': 'Because you watched',
   'home.emptyTitle': 'Nothing here yet',
-  'home.emptyBody':
-      'Add a provider in Settings to fill your home screen with shows and comics.',
+  'home.emptyBody': 'Add a provider in Settings to fill your home screen with shows and comics.',
 
   // Search
   'search.title': 'Search',
@@ -204,8 +196,7 @@ const Map<String, String> enStrings = {
 
   // Providers
   'providers.title': 'Providers',
-  'providers.subtitle':
-      'Providers are JSON catalogs. Add a repo URL to browse its anime, movies, manga and manhwa.',
+  'providers.subtitle': 'Providers are JSON catalogs. Add a repo URL to browse its anime, movies, manga and manhwa.',
   'providers.addProvider': 'Add provider',
   'providers.providerName': 'Provider name',
   'providers.providerUrl': 'Repo JSON URL',
@@ -233,8 +224,7 @@ const Map<String, String> enStrings = {
   'providers.providerRefreshed': 'Provider refreshed',
   'providers.refreshFailed': 'Refresh failed',
   'providers.noAddedRepos': 'No added providers yet',
-  'providers.noAddedReposBody':
-      'Add a repo URL or paste JSON to browse another catalog alongside the sample.',
+  'providers.noAddedReposBody': 'Add a repo URL or paste JSON to browse another catalog alongside the sample.',
   'providers.neverFetched': 'Never updated',
   'providers.cantDeleteBuiltIn':
       'The built-in catalog can’t be removed, but you can turn it off.',
@@ -254,10 +244,8 @@ const Map<String, String> enStrings = {
   'player.resumeFrom': 'Resume from {time}',
   'player.markWatched': 'Mark as watched',
   'player.noVideo': 'No video available for this episode.',
-  'player.itemNotFound':
-      'This title couldn’t be found. It may have been removed from your providers.',
-  'player.videoFailed':
-      'This video couldn’t be played. Check your connection or try another episode.',
+  'player.itemNotFound': 'This title couldn’t be found. It may have been removed from your providers.',
+  'player.videoFailed': 'This video couldn’t be played. Check your connection or try another episode.',
   'player.skipBack10': 'Back 10 seconds',
   'player.skipForward10': 'Forward 10 seconds',
   'player.fullscreen': 'Fullscreen',
@@ -280,37 +268,29 @@ const Map<String, String> enStrings = {
   'reader.brightness': 'Brightness',
   'reader.chapters': 'Chapters',
   'reader.pagesCount': '{count} pages',
-  'reader.itemNotFound':
-      'This title couldn’t be found. It may have been removed from your providers.',
+  'reader.itemNotFound': 'This title couldn’t be found. It may have been removed from your providers.',
   'reader.failedToLoadPage': 'Couldn’t load this page.',
 
   // Backup
   'backup.title': 'Backup & restore',
-  'backup.subtitle':
-      'Export an encrypted backup of your library, history and settings. Your device code unlocks it.',
+  'backup.subtitle': 'Export an encrypted backup of your library, history and settings. Your device code unlocks it.',
   'backup.export': 'Export backup',
   'backup.import': 'Import backup',
   'backup.exported': 'Backup exported',
   'backup.imported': 'Backup restored',
   'backup.failed': 'Backup failed. Please try again.',
-  'backup.warning':
-      'Keep the backup file and your device code together — one without the other can’t restore anything.',
+  'backup.warning': 'Keep the backup file and your device code together — one without the other can’t restore anything.',
   'backup.chooseFile': 'Choose backup file',
   'backup.noBackupFound': 'No backup found in that file.',
   'backup.restoreConfirm': 'Replace your current data with this backup?',
-  'backup.restoreConfirmBody':
-      'Importing will replace your profile, library, history and providers with the backup’s data. This can’t be undone.',
+  'backup.restoreConfirmBody': 'Importing will replace your profile, library, history and providers with the backup’s data. This can’t be undone.',
   'backup.codePrompt': 'Enter your device code',
   'backup.codePromptBody':
       'Your code locks this backup. Only this code can open it again.',
-  'backup.exportDesc':
-      'Save an encrypted copy of your profile, library, history, providers and settings to a .sbbackup file.',
-  'backup.importDesc':
-      'Restore everything from a .sbbackup file you exported earlier. Your current data will be replaced.',
-  'backup.codeAloneNote':
-      'There is no server: your code alone cannot fetch your data on a new device. The backup file is the carrier — keep the file and the code together.',
-  'backup.wrongCode':
-      'That code couldn’t unlock this backup. Check the code, or the file may be damaged.',
+  'backup.exportDesc': 'Save an encrypted copy of your profile, library, history, providers and settings to a .sbbackup file.',
+  'backup.importDesc': 'Restore everything from a .sbbackup file you exported earlier. Your current data will be replaced.',
+  'backup.codeAloneNote': 'There is no server: your code alone cannot fetch your data on a new device. The backup file is the carrier — keep the file and the code together.',
+  'backup.wrongCode': 'That code couldn’t unlock this backup. Check the code, or the file may be damaged.',
   'backup.invalidFile': 'That file doesn’t look like a StreamBox backup.',
   'backup.exportCancelled': 'Export cancelled.',
   'backup.exporting': 'Encrypting backup…',
@@ -380,8 +360,7 @@ const Map<String, String> enStrings = {
   // Manga
   'manga.searchHint': 'Search manga & manhwa…',
   'manga.emptyTitle': 'No manga or manhwa yet',
-  'manga.emptyBody':
-      'Add a provider with comics, or try a different filter.',
+  'manga.emptyBody': 'Add a provider with comics, or try a different filter.',
   'manga.genreAll': 'All genres',
   'manga.newChapters': 'New chapters',
   'manga.browseAll': 'Browse all',
@@ -397,20 +376,23 @@ const Map<String, String> enStrings = {
   'profile.providers': 'My providers',
   'profile.developer': 'Developer',
   'profile.developerName': 'Jarif Ahmed',
-  'profile.codeHint':
-      'Your device code is stored on this device. To see it, go to Settings → Backup & restore.',
+  'profile.codeHint': 'Your device code is stored on this device. To see it, go to Settings → Backup & restore.',
   'profile.viewCode': 'View code',
   'profile.noProfile': 'No profile yet',
   'profile.signOutFailed': 'Couldn’t sign out. Please try again.',
+
+  // Developer
+  'developer.role': 'Developer & Founder of StreamBox',
+  'developer.bio':
+      'Jarif builds StreamBox — a free, local-first home for anime, movies, manga and manhwa. Everything lives on your device: no servers, no cloud accounts, just your own catalogs, your way.',
 
   // Settings
   'settings.notificationsNote':
       'In-app notifications only — no push notifications in this build.',
   'settings.developer': 'Developer',
   'settings.developerName': 'Jarif Ahmed',
-  'settings.aboutBody':
-      'StreamBox brings anime, movies, manga and manhwa from your own JSON provider catalogs into one place. All of your data stays on this device — there is no server account.',
-  'settings.aboutVersion': 'Version 0.1.0',
+  'settings.aboutBody': 'StreamBox brings anime, movies, manga and manhwa from your own JSON provider catalogs into one place. All of your data stays on this device — there is no server account.',
+  'settings.aboutVersion': 'Version 1.0.4',
 
   // Details
   'details.notFoundTitle': 'Title not found',
@@ -424,6 +406,7 @@ const Map<String, String> enStrings = {
   'details.noPages': 'No pages available for this title.',
   'details.resumeEpisode': 'Resume episode {number}',
   'details.resumeChapter': 'Resume chapter {number}',
+  'details.resume': 'Resume',
   'details.statusUnknown': 'Unknown',
   'details.pagesCount': '{count} pages',
 };

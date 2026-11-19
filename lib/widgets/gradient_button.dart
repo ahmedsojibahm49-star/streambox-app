@@ -76,11 +76,23 @@ class _GradientButtonState extends State<GradientButton> {
                       ),
                       const SizedBox(width: 8),
                     ],
-                    Text(
-                      widget.label,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: _enabled ? palette.onBrand : palette.muted,
-                          ),
+                    // The label is Flexible + ellipsis: a long label (or a
+                    // large system font scale / a wide Bangla label) must
+                    // ellipsize inside the button, never overflow it — the
+                    // old bare Text overdrew the neighbouring button at
+                    // 360px ("Resume episo…" over the bookmark button).
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  color: _enabled
+                                      ? palette.onBrand
+                                      : palette.muted,
+                                ),
+                      ),
                     ),
                   ],
                 ),

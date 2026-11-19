@@ -483,7 +483,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       return EmptyState(
         title: tr(context, 'search.noResultsTitle'),
         body: tr(context, 'search.noResultsBody'),
-        icon: Iconsax.search_normal,
+        icon: Iconsax.search_normal_copy,
         actionLabel: _filters.hasActive || _type != null
             ? tr(context, 'search.clearFilters')
             : null,

@@ -7,6 +7,7 @@ import '../screens/auth/signup_screen.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/backup_screen.dart';
 import '../screens/details_screen.dart';
+import '../screens/developer_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/library_screen.dart';
 import '../screens/manga_screen.dart';
@@ -23,7 +24,7 @@ import '../screens/welcome_screen.dart';
 import '../services/auth_service.dart';
 import '../widgets/bottom_nav_bar.dart';
 
-/// App routing (go_router). All 16 routes return real screens; the only
+/// App routing (go_router). All 17 routes return real screens; the only
 /// remaining [PlaceholderScreen] use is the 404 errorBuilder below.
 ///
 /// Route table (see CONTRACT.md):
@@ -35,6 +36,7 @@ import '../widgets/bottom_nav_bar.dart';
 ///   /home /search /manga /library /profile   bottom-nav shell branches
 ///   /settings             settings
 ///   /settings/providers   providers (inside settings)
+///   /developer            developer page (from Profile / Settings)
 ///   /details/:id          title details
 ///   /player/:id           video player
 ///   /reader/:id           manga/manhwa reader
@@ -152,6 +154,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings/providers/add',
         builder: (context, state) => const AddRepoScreen(),
+      ),
+      GoRoute(
+        path: '/developer',
+        builder: (context, state) => const DeveloperScreen(),
       ),
       GoRoute(
         path: '/details/:id',

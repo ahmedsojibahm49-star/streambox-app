@@ -12,6 +12,7 @@ import '../services/backup_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/code_generator.dart';
 import '../widgets/widgets.dart';
+import 'screen_helpers.dart';
 
 /// Backup & restore (`/backup`), reached from Settings.
 ///
@@ -37,9 +38,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    showSnack(context, message);
   }
 
   void _showError(BackupException e) =>
@@ -50,76 +49,79 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
   /// Ask for the device code. Returns the normalised code, or null when
   /// the user cancels.
+  ///
+  /// v1.0.4: a mistyped code does NOT close the dialog any more — the
+  /// error shows inline and the user corrects it in place. The old
+  /// dialog popped with the bad code and the caller showed a snackbar,
+  /// so a typo forced the whole export/import to be restarted.
   Future<String?> _askForCode() async {
-    final controller = TextEditingController();
-    try {
-      final code = await showDialog<String>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(tr(dialogContext, 'backup.codePrompt')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr(dialogContext, 'backup.codePromptBody'),
-                style: Theme.of(dialogContext)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      color: dialogContext.palette.muted,
-                    ),
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                controller: controller,
-                label: tr(dialogContext, 'auth.deviceCode'),
-                hint: tr(dialogContext, 'auth.codeHint'),
-                prefixIcon: Iconsax.key,
-                autofocus: true,
-                onSubmitted: (_) => Navigator.of(dialogContext).pop(
-                  DeviceCode.normalize(controller.text),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(tr(dialogContext, 'common.cancel')),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(
-                DeviceCode.normalize(controller.text),
-              ),
-              child: Text(tr(dialogContext, 'backup.unlockBackup')),
-            ),
-          ],
-        ),
-      );
+    // The dialog owns its TextEditingController (created in initState,
+    // disposed in the dialog widget's dispose). Disposing it here in a
+    // `finally` after showDialog returns is WRONG: showDialog's future
+    // completes the moment the route pops, but the dialog widget stays
+    // in the tree through the pop animation — and the text field
+    // rebuilds during that animation, touching the disposed controller
+    // ("used after being disposed").
+    final code = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => const _CodeDialog(),
+    );
+    if (!mounted) return null;
+    // Defense-in-depth: the dialog already validates, but never trust
+    // a code that fails the format check.
+    if (code == null || code.isEmpty || !DeviceCode.isValid(code)) {
+      return null;
+    }
+    return code;
+  }
+
+  /// Ask for the device code until it matches this device's stored code
+  /// (or the user cancels). A wrong code shows an error and re-asks —
+  /// v1.0.4: the old export dropped back to the screen on a wrong code
+  /// and the user had to tap Export and start over.
+  Future<String?> _askForMatchingCode() async {
+    while (true) {
+      final code = await _askForCode();
+      if (code == null || !mounted) return null;
+      final valid = await ref.read(authServiceProvider).verifyCode(code);
       if (!mounted) return null;
-      if (code == null || code.isEmpty) return null;
-      if (!DeviceCode.isValid(code)) {
-        _showMessage(tr(context, 'auth.codeInvalid'));
-        return null;
+      if (valid) return code;
+      _showMessage(tr(context, 'auth.errorWrongCode'));
+    }
+  }
+
+  /// Decrypt the picked backup, re-asking for the code on a wrong code.
+  /// Returns null when the user cancels the code prompt. Other failures
+  /// (not a backup file, corrupt data) rethrow to the caller's handler.
+  ///
+  /// v1.0.4: the file is already picked at this point, so a wrong code
+  /// must not force the user to pick the file again.
+  Future<Map<String, dynamic>?> _prepareImport(
+    String envelopeJson,
+  ) async {
+    while (true) {
+      final code = await _askForCode();
+      if (code == null || !mounted) return null;
+      try {
+        return await _backup.prepareImportFromContent(
+          envelopeJson: envelopeJson,
+          deviceCode: code,
+        );
+      } on BackupException catch (e) {
+        if (e.key == 'backup.wrongCode') {
+          _showError(e);
+          continue;
+        }
+        rethrow;
       }
-      return code;
-    } finally {
-      controller.dispose();
     }
   }
 
   Future<void> _export() async {
     if (_busy) return;
-    final code = await _askForCode();
-    if (code == null || !mounted) return;
     // The code must match this device's stored code before exporting.
-    final valid = await ref.read(authServiceProvider).verifyCode(code);
-    if (!mounted) return;
-    if (!valid) {
-      _showMessage(tr(context, 'auth.errorWrongCode'));
-      return;
-    }
+    final code = await _askForMatchingCode();
+    if (code == null || !mounted) return;
     setState(() {
       _busy = true;
       _busyLabelKey = 'backup.exporting';
@@ -160,17 +162,23 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         allowedExtensions: ['sbbackup'],
       );
       if (picked == null || !mounted) return;
-      final code = await _askForCode();
-      if (code == null || !mounted) return;
 
-      // Decrypt first (validates the code) WITHOUT changing any data.
       // readAsBytes works on every platform (web picks have no path).
       final pickedBytes = await picked.readAsBytes();
-      final payload = await _backup.prepareImportFromContent(
-        envelopeJson: utf8.decode(pickedBytes),
-        deviceCode: code,
-      );
-      if (!mounted) return;
+      // v1.0.4: a non-UTF-8 file is not a StreamBox backup at all — say
+      // so specifically instead of the generic "backup failed" (the old
+      // code let the FormatException fall into the generic catch).
+      final String envelopeJson;
+      try {
+        envelopeJson = utf8.decode(pickedBytes);
+      } on FormatException {
+        if (mounted) _showMessage(tr(context, 'backup.invalidFile'));
+        return;
+      }
+
+      // Decrypt first (validates the code) WITHOUT changing any data.
+      final payload = await _prepareImport(envelopeJson);
+      if (payload == null || !mounted) return;
       setState(() {
         _busy = false;
         _busyLabelKey = null;
@@ -397,6 +405,91 @@ class _BackupCard extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// The device-code prompt, as its own widget so it owns the
+/// [TextEditingController] lifecycle: created in initState, disposed in
+/// dispose — which runs only when the dialog actually leaves the tree
+/// (after the pop animation), never while the text field can still
+/// rebuild.
+class _CodeDialog extends StatefulWidget {
+  const _CodeDialog();
+
+  @override
+  State<_CodeDialog> createState() => _CodeDialogState();
+}
+
+class _CodeDialogState extends State<_CodeDialog> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final normalized = DeviceCode.normalize(_controller.text);
+    if (!DeviceCode.isValid(normalized)) {
+      setState(() => _error = tr(context, 'auth.codeInvalid'));
+      return;
+    }
+    Navigator.of(context).pop(normalized);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(tr(context, 'backup.codePrompt')),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            tr(context, 'backup.codePromptBody'),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: context.palette.muted),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            controller: _controller,
+            label: tr(context, 'auth.deviceCode'),
+            hint: tr(context, 'auth.codeHint'),
+            prefixIcon: Iconsax.key,
+            autofocus: true,
+            onChanged: (_) {
+              // Clear the error as soon as the user edits.
+              if (_error != null) setState(() => _error = null);
+            },
+            onSubmitted: (_) => _submit(),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: AppColors.danger),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(tr(context, 'common.cancel')),
+        ),
+        TextButton(
+          onPressed: _submit,
+          child: Text(tr(context, 'backup.unlockBackup')),
+        ),
+      ],
     );
   }
 }

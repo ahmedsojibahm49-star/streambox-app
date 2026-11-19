@@ -154,6 +154,7 @@ class MyListNotifier extends Notifier<List<LibraryEntry>> {
       providerId: providerId,
       list: LibraryList.myList,
     );
+    if (!ref.mounted) return added;
     state = service.entriesFor(LibraryList.myList);
     return added;
   }
@@ -176,6 +177,7 @@ class FavoritesNotifier extends Notifier<List<LibraryEntry>> {
       providerId: providerId,
       list: LibraryList.favorite,
     );
+    if (!ref.mounted) return added;
     state = service.entriesFor(LibraryList.favorite);
     return added;
   }
@@ -214,12 +216,19 @@ class HistoryNotifier extends Notifier<List<HistoryEntry>> {
     } catch (_) {
       return;
     }
+    // The provider may have been disposed while the Hive write was in
+    // flight (e.g. the player saving on dispose as its scope goes away).
+    // Setting state on a disposed ref throws UnmountedRefException — an
+    // unhandled async error. The write already landed; the state refresh
+    // is pointless if nobody is listening.
+    if (!ref.mounted) return;
     state = service.recentHistory();
   }
 
   Future<void> clear() async {
     final service = ref.read(libraryServiceProvider);
     await service.clearHistory();
+    if (!ref.mounted) return;
     state = const [];
   }
 
@@ -231,6 +240,7 @@ class HistoryNotifier extends Notifier<List<HistoryEntry>> {
   }) async {
     final service = ref.read(libraryServiceProvider);
     await service.removeHistoryItem(itemId: itemId, providerId: providerId);
+    if (!ref.mounted) return;
     state = service.recentHistory();
   }
 }

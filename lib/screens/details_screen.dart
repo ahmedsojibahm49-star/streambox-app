@@ -58,8 +58,7 @@ class DetailsScreen extends ConsumerWidget {
         return false;
       }
       return other.genres.any(item.genres.contains);
-    }).toList()
-      ..sort((a, b) => (b.rating ?? -1).compareTo(a.rating ?? -1));
+    }).toList()..sort((a, b) => (b.rating ?? -1).compareTo(a.rating ?? -1));
 
     return Scaffold(
       body: CustomScrollView(
@@ -100,14 +99,16 @@ class DetailsScreen extends ConsumerWidget {
                   Text(
                     typeLabel(context, item.type).toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.brand,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
+                      color: AppColors.brand,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     item.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(height: 8),
@@ -123,10 +124,7 @@ class DetailsScreen extends ConsumerWidget {
                           Formatters.rating(item.rating),
                           icon: Iconsax.star_1,
                         ),
-                      _metaChip(
-                        context,
-                        statusLabel(context, item.status),
-                      ),
+                      _metaChip(context, statusLabel(context, item.status)),
                       if (readable && item.chapters.isNotEmpty)
                         _metaChip(
                           context,
@@ -163,121 +161,144 @@ class DetailsScreen extends ConsumerWidget {
                     ),
                   ],
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: GradientButton(
-                          label: _primaryLabel(context, item, progress),
-                          icon: Iconsax.play_copy,
-                          onPressed: () =>
-                              _onPrimary(context, item, progress),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _actionButton(
-                        context,
-                        icon: inMyList
-                            ? Iconsax.bookmark_copy
-                            : Iconsax.bookmark,
-                        tooltip: inMyList
-                            ? tr(context, 'details.inList')
-                            : tr(context, 'details.addToList'),
-                        active: inMyList,
-                        onPressed: () async {
-                          try {
-                            final added = await ref
-                                .read(myListProvider.notifier)
-                                .toggle(item.id, item.providerId);
-                            if (context.mounted) {
-                              showSnack(
-                                context,
-                                tr(
-                                  context,
-                                  added
-                                      ? 'library.addedToList'
-                                      : 'library.removedFromList',
-                                ),
-                              );
-                            }
-                          } catch (_) {
-                            if (context.mounted) {
-                              showSnack(
-                                context,
-                                tr(context, 'common.errorGeneric'),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 10),
-                      _actionButton(
-                        context,
-                        icon: isFavorite
-                            ? Iconsax.heart_copy
-                            : Iconsax.heart,
-                        tooltip: tr(context, 'details.favorite'),
-                        active: isFavorite,
-                        onPressed: () async {
-                          try {
-                            final added = await ref
-                                .read(favoritesProvider.notifier)
-                                .toggle(item.id, item.providerId);
-                            if (context.mounted) {
-                              showSnack(
-                                context,
-                                tr(
-                                  context,
-                                  added
-                                      ? 'library.addedToFavorites'
-                                      : 'library.removedFromFavorites',
-                                ),
-                              );
-                            }
-                          } catch (_) {
-                            if (context.mounted) {
-                              showSnack(
-                                context,
-                                tr(context, 'common.errorGeneric'),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 10),
-                      _actionButton(
-                        context,
-                        icon: Iconsax.share,
-                        tooltip: tr(context, 'common.share'),
-                        // share_plus is a platform-channel call — the old
-                        // code fired it unawaited and unguarded, so a
-                        // broken plugin layer was an unhandled async
-                        // error and the user got no feedback at all.
-                        onPressed: () async {
-                          try {
-                            await SharePlus.instance.share(
-                              ShareParams(
-                                text: trParams(
-                                  context,
-                                  'details.shareText',
-                                  {'title': item.title},
-                                ),
-                              ),
-                            );
-                          } catch (_) {
-                            if (context.mounted) {
-                              showSnack(
-                                context,
-                                tr(context, 'common.errorGeneric'),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // At 360px the content column is 320 wide: three
+                      // 52px buttons + gaps leave only ~134px for the
+                      // CTA — the old "Resume episode 3" label overflowed
+                      // it and painted over the bookmark button (a Row
+                      // overflow doesn't clip, it overdraws). Shrink the
+                      // icon buttons on narrow screens so the CTA keeps
+                      // a comfortable width, and keep the CTA height
+                      // matched to them.
+                      final narrow = constraints.maxWidth < 400;
+                      final actionSize = narrow ? 44.0 : 52.0;
+                      final gap = narrow ? 8.0 : 10.0;
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: GradientButton(
+                              label: _primaryLabel(context, item, progress),
+                              icon: Iconsax.play_copy,
+                              height: actionSize,
+                              onPressed: () =>
+                                  _onPrimary(context, item, progress),
+                            ),
+                          ),
+                          SizedBox(width: gap),
+                          _actionButton(
+                            context,
+                            size: actionSize,
+                            icon: inMyList
+                                ? Iconsax.bookmark_copy
+                                : Iconsax.bookmark,
+                            tooltip: inMyList
+                                ? tr(context, 'details.inList')
+                                : tr(context, 'details.addToList'),
+                            active: inMyList,
+                            onPressed: () async {
+                              try {
+                                final added = await ref
+                                    .read(myListProvider.notifier)
+                                    .toggle(item.id, item.providerId);
+                                if (context.mounted) {
+                                  showSnack(
+                                    context,
+                                    tr(
+                                      context,
+                                      added
+                                          ? 'library.addedToList'
+                                          : 'library.removedFromList',
+                                    ),
+                                  );
+                                }
+                              } catch (_) {
+                                if (context.mounted) {
+                                  showSnack(
+                                    context,
+                                    tr(context, 'common.errorGeneric'),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                          SizedBox(width: gap),
+                          _actionButton(
+                            context,
+                            size: actionSize,
+                            icon: isFavorite
+                                ? Iconsax.heart_copy
+                                : Iconsax.heart,
+                            tooltip: tr(context, 'details.favorite'),
+                            active: isFavorite,
+                            onPressed: () async {
+                              try {
+                                final added = await ref
+                                    .read(favoritesProvider.notifier)
+                                    .toggle(item.id, item.providerId);
+                                if (context.mounted) {
+                                  showSnack(
+                                    context,
+                                    tr(
+                                      context,
+                                      added
+                                          ? 'library.addedToFavorites'
+                                          : 'library.removedFromFavorites',
+                                    ),
+                                  );
+                                }
+                              } catch (_) {
+                                if (context.mounted) {
+                                  showSnack(
+                                    context,
+                                    tr(context, 'common.errorGeneric'),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                          SizedBox(width: gap),
+                          _actionButton(
+                            context,
+                            size: actionSize,
+                            icon: Iconsax.share,
+                            tooltip: tr(context, 'common.share'),
+                            // share_plus is a platform-channel call — the old
+                            // code fired it unawaited and unguarded, so a
+                            // broken plugin layer was an unhandled async
+                            // error and the user got no feedback at all.
+                            onPressed: () async {
+                              try {
+                                await SharePlus.instance.share(
+                                  ShareParams(
+                                    text: trParams(
+                                      context,
+                                      'details.shareText',
+                                      {'title': item.title},
+                                    ),
+                                  ),
+                                );
+                              } catch (_) {
+                                if (context.mounted) {
+                                  showSnack(
+                                    context,
+                                    tr(context, 'common.errorGeneric'),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                  if (item.overview != null &&
-                      item.overview!.isNotEmpty) ...[
+                  // Where "Resume" goes — the episode/chapter number
+                  // lives here now, not inside the button.
+                  if (progress != null) ...[
+                    const SizedBox(height: 10),
+                    _resumeCaption(context, item, progress),
+                  ],
+                  if (item.overview != null && item.overview!.isNotEmpty) ...[
                     const SizedBox(height: 24),
                     Text(
                       tr(context, 'details.overview'),
@@ -286,9 +307,7 @@ class DetailsScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text(
                       item.overview!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
+                      style: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(color: palette.muted),
                     ),
                   ],
@@ -309,9 +328,9 @@ class DetailsScreen extends ConsumerWidget {
             ),
           ),
           if (readable)
-            _chapterList(context, item)
+            _chapterList(context, item, progress)
           else
-            _episodeList(context, item),
+            _episodeList(context, item, progress),
           // More like this.
           if (moreLikeThis.isNotEmpty) ...[
             SliverToBoxAdapter(
@@ -329,8 +348,9 @@ class DetailsScreen extends ConsumerWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount:
-                      moreLikeThis.length > 10 ? 10 : moreLikeThis.length,
+                  itemCount: moreLikeThis.length > 10
+                      ? 10
+                      : moreLikeThis.length,
                   separatorBuilder: (_, _) => const SizedBox(width: 12),
                   itemBuilder: (context, index) {
                     final other = moreLikeThis[index];
@@ -339,7 +359,8 @@ class DetailsScreen extends ConsumerWidget {
                       child: PosterCard(
                         poster: posterOf(other),
                         title: other.title,
-                        subtitle: other.year?.toString() ??
+                        subtitle:
+                            other.year?.toString() ??
                             typeLabel(context, other.type),
                         rating: other.rating,
                         onTap: () => openDetails(context, other),
@@ -361,19 +382,47 @@ class DetailsScreen extends ConsumerWidget {
     ProviderItem item,
     HistoryEntry? progress,
   ) {
-    if (progress != null) {
-      if (isReadable(item.type)) {
-        return trParams(context, 'details.resumeChapter', {
-          'number': progress.episodeOrChapter.toString(),
-        });
-      }
-      return trParams(context, 'details.resumeEpisode', {
-        'number': progress.episodeOrChapter.toString(),
-      });
-    }
+    // Just "Resume" — the episode/chapter number lives in the caption
+    // underneath (the old "Resume episode 3" label overflowed the button
+    // at 360px and painted over the bookmark button).
+    if (progress != null) return tr(context, 'details.resume');
     return isReadable(item.type)
         ? tr(context, 'details.readNow')
         : tr(context, 'details.watchNow');
+  }
+
+  /// "Episode 3 · 12:34" under the Resume button — where Resume goes.
+  Widget _resumeCaption(
+    BuildContext context,
+    ProviderItem item,
+    HistoryEntry progress,
+  ) {
+    final palette = context.palette;
+    final target = isReadable(item.type)
+        ? trParams(context, 'reader.chapter', {
+            'number': progress.episodeOrChapter.toString(),
+          })
+        : trParams(context, 'player.episode', {
+            'number': progress.episodeOrChapter.toString(),
+          });
+    final position = progress.positionSeconds > 0
+        ? ' · ${Formatters.duration(progress.positionSeconds)}'
+        : '';
+    return Row(
+      children: [
+        Icon(Iconsax.clock, size: 14, color: palette.muted),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            '$target$position',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: palette.muted),
+          ),
+        ),
+      ],
+    );
   }
 
   void _onPrimary(
@@ -387,22 +436,14 @@ class DetailsScreen extends ConsumerWidget {
         showSnack(context, tr(context, 'details.noPages'));
         return;
       }
-      openReader(
-        context,
-        item,
-        chapter: resumeAt ?? _firstChapterNumber(item),
-      );
+      openReader(context, item, chapter: resumeAt ?? _firstChapterNumber(item));
       return;
     }
     if (item.episodes.isEmpty) {
       showSnack(context, tr(context, 'details.noVideo'));
       return;
     }
-    openPlayer(
-      context,
-      item,
-      episode: resumeAt ?? _firstEpisodeNumber(item),
-    );
+    openPlayer(context, item, episode: resumeAt ?? _firstEpisodeNumber(item));
   }
 
   int? _firstEpisodeNumber(ProviderItem item) {
@@ -443,6 +484,7 @@ class DetailsScreen extends ConsumerWidget {
     required String tooltip,
     required VoidCallback onPressed,
     bool active = false,
+    double size = 52,
   }) {
     final palette = context.palette;
     // FocusableCard (not a bare GestureDetector) so the buttons are
@@ -453,8 +495,8 @@ class DetailsScreen extends ConsumerWidget {
         onPressed: onPressed,
         borderRadius: AppColors.radiusM,
         child: Container(
-          width: 52,
-          height: 52,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color: active
                 ? AppColors.brand.withValues(alpha: 0.15)
@@ -466,7 +508,7 @@ class DetailsScreen extends ConsumerWidget {
           ),
           child: Icon(
             icon,
-            size: 22,
+            size: size * 0.42,
             color: active ? AppColors.brand : palette.text,
           ),
         ),
@@ -474,7 +516,11 @@ class DetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _episodeList(BuildContext context, ProviderItem item) {
+  Widget _episodeList(
+    BuildContext context,
+    ProviderItem item,
+    HistoryEntry? progress,
+  ) {
     final episodes = item.episodes;
     if (episodes.isEmpty) {
       return SliverToBoxAdapter(
@@ -482,46 +528,54 @@ class DetailsScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             tr(context, 'details.noEpisodes'),
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
+            style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(color: context.palette.muted),
           ),
         ),
       );
     }
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final episode = episodes[index];
-          final number = (episode['number'] as num?)?.toInt() ?? index + 1;
-          final title = episode['title'] as String? ??
-              trParams(
-                context,
-                'player.episode',
-                {'number': number.toString()},
-              );
-          final duration = (episode['durationSeconds'] as num?)?.toInt();
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            child: _listRow(
-              context,
-              number: number,
-              title: title,
-              subtitle: duration != null
-                  ? Formatters.duration(duration)
-                  : null,
-              icon: Iconsax.play_circle,
-              onTap: () => openPlayer(context, item, episode: number),
-            ),
-          );
-        },
-        childCount: episodes.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final episode = episodes[index];
+        final number = (episode['number'] as num?)?.toInt() ?? index + 1;
+        final title =
+            episode['title'] as String? ??
+            trParams(context, 'player.episode', {'number': number.toString()});
+        final duration = (episode['durationSeconds'] as num?)?.toInt();
+        // The episode Resume would open is highlighted, with its saved
+        // position ("12:34 / 24:00") instead of just the runtime.
+        final isResumeTarget = progress?.episodeOrChapter == number;
+        String? subtitle;
+        if (duration != null) {
+          subtitle = Formatters.duration(duration);
+          if (isResumeTarget &&
+              progress != null &&
+              progress.positionSeconds > 0) {
+            subtitle =
+                '${Formatters.duration(progress.positionSeconds)} / $subtitle';
+          }
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: _listRow(
+            context,
+            number: number,
+            title: title,
+            subtitle: subtitle,
+            icon: Iconsax.play_circle,
+            highlighted: isResumeTarget,
+            onTap: () => openPlayer(context, item, episode: number),
+          ),
+        );
+      }, childCount: episodes.length),
     );
   }
 
-  Widget _chapterList(BuildContext context, ProviderItem item) {
+  Widget _chapterList(
+    BuildContext context,
+    ProviderItem item,
+    HistoryEntry? progress,
+  ) {
     final chapters = item.chapters;
     if (chapters.isEmpty) {
       return SliverToBoxAdapter(
@@ -529,45 +583,39 @@ class DetailsScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             tr(context, 'details.noChapters'),
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
+            style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(color: context.palette.muted),
           ),
         ),
       );
     }
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final chapter = chapters[index];
-          final number = (chapter['number'] as num?)?.toInt() ?? index + 1;
-          final title = chapter['title'] as String? ??
-              trParams(
-                context,
-                'reader.chapter',
-                {'number': number.toString()},
-              );
-          final pages = chapter['pageUrls'];
-          final pageCount = pages is List ? pages.length : null;
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            child: _listRow(
-              context,
-              number: number,
-              title: title,
-              subtitle: pageCount != null
-                  ? trParams(context, 'details.pagesCount', {
-                      'count': pageCount.toString(),
-                    })
-                  : null,
-              icon: Iconsax.book,
-              onTap: () => openReader(context, item, chapter: number),
-            ),
-          );
-        },
-        childCount: chapters.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final chapter = chapters[index];
+        final number = (chapter['number'] as num?)?.toInt() ?? index + 1;
+        final title =
+            chapter['title'] as String? ??
+            trParams(context, 'reader.chapter', {'number': number.toString()});
+        final pages = chapter['pageUrls'];
+        final pageCount = pages is List ? pages.length : null;
+        final isResumeTarget = progress?.episodeOrChapter == number;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: _listRow(
+            context,
+            number: number,
+            title: title,
+            subtitle: pageCount != null
+                ? trParams(context, 'details.pagesCount', {
+                    'count': pageCount.toString(),
+                  })
+                : null,
+            icon: Iconsax.book,
+            highlighted: isResumeTarget,
+            onTap: () => openReader(context, item, chapter: number),
+          ),
+        );
+      }, childCount: chapters.length),
     );
   }
 
@@ -578,11 +626,25 @@ class DetailsScreen extends ConsumerWidget {
     String? subtitle,
     required IconData icon,
     required VoidCallback onTap,
+    bool highlighted = false,
   }) {
     final palette = context.palette;
     return Material(
-      color: palette.card,
-      borderRadius: BorderRadius.circular(AppColors.radiusM),
+      color: highlighted
+          ? AppColors.brand.withValues(alpha: 0.12)
+          : palette.card,
+      // Material asserts when BOTH shape and borderRadius are set, so the
+      // highlighted row carries the radius inside its shape and the plain
+      // row uses borderRadius. (Passing both crashed the episode list.)
+      borderRadius: highlighted
+          ? null
+          : BorderRadius.circular(AppColors.radiusM),
+      shape: highlighted
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppColors.radiusM),
+              side: const BorderSide(color: AppColors.brand),
+            )
+          : null,
       child: InkWell(
         borderRadius: BorderRadius.circular(AppColors.radiusM),
         onTap: onTap,
@@ -600,9 +662,8 @@ class DetailsScreen extends ConsumerWidget {
                 alignment: Alignment.center,
                 child: Text(
                   number.toString(),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.brand,
-                      ),
+                  style: Theme.of(context).textTheme.titleSmall
+                      ?.copyWith(color: AppColors.brand),
                 ),
               ),
               const SizedBox(width: 12),

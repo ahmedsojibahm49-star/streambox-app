@@ -26,7 +26,7 @@ class BottomNavBar extends StatelessWidget {
     ),
     _NavTab(
       labelKey: 'common.search',
-      icon: Iconsax.search_normal,
+      icon: Iconsax.search_normal_copy,
       activeIcon: Iconsax.search_normal_copy,
     ),
     _NavTab(

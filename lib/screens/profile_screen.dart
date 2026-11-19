@@ -224,7 +224,7 @@ class ProfileScreen extends ConsumerWidget {
             icon: Iconsax.code,
             label: tr(context, 'profile.developer'),
             trailing: tr(context, 'profile.developerName'),
-            onTap: () => _showDeveloper(context),
+            onTap: () => context.push('/developer'),
           ),
           const SizedBox(height: 8),
           _row(
@@ -338,33 +338,6 @@ class ProfileScreen extends ConsumerWidget {
             Text(tr(context, 'settings.aboutVersion')),
             const SizedBox(height: 8),
             Text(tr(context, 'settings.aboutBody')),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(tr(context, 'common.ok')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeveloper(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(tr(context, 'profile.developer')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(
-              radius: 40,
-              backgroundImage:
-                  AssetImage('assets/images/developer_photo.jpg'),
-            ),
-            const SizedBox(height: 12),
-            Text(tr(context, 'profile.developerName')),
           ],
         ),
         actions: [

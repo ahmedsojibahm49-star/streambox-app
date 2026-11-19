@@ -273,7 +273,13 @@ class _PlayerSeekBarState extends State<PlayerSeekBar> {
                         ),
                       ),
                       Positioned(
-                        left: _playedFraction * width - 7,
+                        // The knob is 14px wide, centered on the play head;
+                        // clamp it inside the track so it never hangs half
+                        // off either edge (at 0% it used to sit at left: -7,
+                        // half-clipped; at 100% it stuck out 7px right).
+                        left: (_playedFraction * width - 7)
+                            .clamp(0.0, width > 14 ? width - 14 : 0.0)
+                            .toDouble(),
                         top: 0,
                         child: Container(
                           width: 14,

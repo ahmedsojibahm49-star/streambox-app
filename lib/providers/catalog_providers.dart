@@ -57,20 +57,26 @@ class ProvidersListNotifier extends Notifier<List<ProviderRepo>> {
 
   void _refresh() => state = ref.read(providerServiceProvider).listRepos();
 
-  /// Fetch a repo from [url], validate it and add it. Throws [RepoException]
-  /// with a user-facing message on any failure.
-  Future<ProviderRepo> addFromUrl(String url) async {
-    final repo = await ref.read(providerServiceProvider).fetchRepo(url);
+  /// Fetch a repo from [url], validate it and add it. Returns one repo per
+  /// catalog in the file (a multi-catalog file adds several rows).
+  /// Throws [RepoException] with a user-facing message on any failure.
+  /// The list refresh runs after the persist, so the Providers screen and
+  /// every catalog consumer (Home / Search / Manga, which watch
+  /// [allEnabledItemsProvider] below) see the new items immediately, with
+  /// no restart.
+  Future<List<ProviderRepo>> addFromUrl(String url) async {
+    final repos = await ref.read(providerServiceProvider).fetchRepos(url);
     _refresh();
-    return repo;
+    return repos;
   }
 
-  /// Add a repo from pasted JSON text. Throws [RepoException] on invalid JSON.
-  Future<ProviderRepo> addFromJson(String rawJson) async {
-    final repo =
-        await ref.read(providerServiceProvider).addRepoFromJson(rawJson);
+  /// Add repo(s) from pasted JSON text. Returns one repo per catalog in
+  /// the pasted JSON. Throws [RepoException] on invalid JSON.
+  Future<List<ProviderRepo>> addFromJson(String rawJson) async {
+    final repos =
+        await ref.read(providerServiceProvider).addReposFromJson(rawJson);
     _refresh();
-    return repo;
+    return repos;
   }
 
   /// Delete a repo and its cached items. Throws [RepoException] for the

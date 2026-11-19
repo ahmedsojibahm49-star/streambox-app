@@ -1,7 +1,7 @@
 name: streambox
 description: "StreamBox — anime, movies, manga & manhwa from your own JSON provider catalogs. Local-first, no server."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.4+4
 
 environment:
   sdk: ^3.14.0
@@ -62,6 +62,13 @@ dev_dependencies:
   build_runner: ^2.4.13
 
   flutter_launcher_icons: ^0.14.4
+
+  # Test-only fakes for the video player platform interface: the player
+  # error-state test installs a throwing platform (see
+  # test/player_details_v104_test.dart). Direct dev deps so the
+  # depend_on_referenced_packages lint stays happy.
+  plugin_platform_interface: ^2.1.8
+  video_player_platform_interface: ^6.9.0
 
 flutter:
   uses-material-design: true

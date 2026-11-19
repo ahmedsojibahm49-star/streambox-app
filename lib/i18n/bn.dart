@@ -45,8 +45,7 @@ const Map<String, String> bnStrings = {
 
   // Auth
   'auth.welcomeTitle': 'আপনার শো, আপনার মতো করে',
-  'auth.welcomeSubtitle':
-      'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — আপনার নিজের প্রোভাইডার থেকে, এক জায়গায়, অফলাইন-ফার্স্ট।',
+  'auth.welcomeSubtitle': 'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — আপনার নিজের প্রোভাইডার থেকে, এক জায়গায়, অফলাইন-ফার্স্ট।',
   'auth.login': 'লগ ইন',
   'auth.signup': 'সাইন আপ',
   'auth.logout': 'লগ আউট',
@@ -62,8 +61,7 @@ const Map<String, String> bnStrings = {
   'auth.loginTitle': 'আবার স্বাগতম',
   'auth.signupTitle': 'আপনার অ্যাকাউন্ট তৈরি করুন',
   'auth.codeTitle': 'আপনার ডিভাইস কোড',
-  'auth.codeSubtitle':
-      'এই কোড দিয়ে এই ডিভাইসে আপনার অ্যাকাউন্ট খুলবে। নিরাপদে রাখুন — লগ ইন করতে এটি লাগবে।',
+  'auth.codeSubtitle': 'এই কোড দিয়ে এই ডিভাইসে আপনার অ্যাকাউন্ট খুলবে। নিরাপদে রাখুন — লগ ইন করতে এটি লাগবে।',
   'auth.codeHint': 'SB-XXXX-XXXX-XXXX',
   'auth.codeInvalid': 'কোডটি ঠিক মনে হচ্ছে না',
   'auth.codeCopied': 'কোড কপি হয়েছে',
@@ -83,18 +81,15 @@ const Map<String, String> bnStrings = {
   'auth.errorAccountExists':
       'এই ডিভাইসে ইতিমধ্যে একটি অ্যাকাউন্ট আছে। লগ ইন করুন।',
   'auth.iSavedMyCode': 'আমি কোডটি সংরক্ষণ করেছি',
-  'auth.forgotCodeHint':
-      'আপনার কোডটি সাইন আপের সময় একবারই দেখানো হয়েছিল। যেখানে সংরক্ষণ করেছিলেন, সেখানে দেখুন — এটি ছাড়া লগ ইন বা ব্যাকআপ ফেরানো যাবে না।',
+  'auth.forgotCodeHint': 'আপনার কোডটি সাইন আপের সময় একবারই দেখানো হয়েছিল। যেখানে সংরক্ষণ করেছিলেন, সেখানে দেখুন — এটি ছাড়া লগ ইন বা ব্যাকআপ ফেরানো যাবে না।',
   'auth.showPassword': 'পাসওয়ার্ড দেখুন',
   'auth.hidePassword': 'পাসওয়ার্ড লুকান',
-  'auth.signupSubtitle':
-      'আপনার অ্যাকাউন্ট শুধু এই ডিভাইসেই থাকে — কোনো সার্ভার নেই, কোনো ট্র্যাকিং নেই।',
+  'auth.signupSubtitle': 'আপনার অ্যাকাউন্ট শুধু এই ডিভাইসেই থাকে — কোনো সার্ভার নেই, কোনো ট্র্যাকিং নেই।',
   'auth.loginSubtitle': 'এগিয়ে যেতে ইমেইল, পাসওয়ার্ড ও ডিভাইস কোড দিন।',
   'auth.loginSuccessBody': '{name} হিসেবে সাইন ইন হয়েছে।',
   'auth.checkingSession': 'সেশন যাচাই হচ্ছে…',
   'auth.deleteAccount': 'অ্যাকাউন্ট মুছুন',
-  'auth.deleteAccountConfirm':
-      'এই ডিভাইস থেকে আপনার অ্যাকাউন্ট ও সব ডেটা মুছে ফেলবেন? আপনার লাইব্রেরি, ইতিহাস ও প্রোফাইল চিরতরে মুছে যাবে।',
+  'auth.deleteAccountConfirm': 'এই ডিভাইস থেকে আপনার অ্যাকাউন্ট ও সব ডেটা মুছে ফেলবেন? আপনার লাইব্রেরি, ইতিহাস ও প্রোফাইল চিরতরে মুছে যাবে।',
   'auth.accountDeleted': 'অ্যাকাউন্ট মুছে ফেলা হয়েছে।',
   'auth.creatingAccount': 'অ্যাকাউন্ট তৈরি হচ্ছে…',
   'auth.loggingIn': 'লগ ইন হচ্ছে…',
@@ -105,8 +100,7 @@ const Map<String, String> bnStrings = {
   'onboarding.slide1Body':
       'অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া — অ্যাপ না বদলে দেখুন ও পড়ুন।',
   'onboarding.slide2Title': 'আপনার প্রোভাইডার, আপনার ক্যাটালগ',
-  'onboarding.slide2Body':
-      'JSON ক্যাটালগ রেপো যোগ করুন ও একসাথে ব্রাউজ করুন। কোনো সার্ভারে অ্যাকাউন্ট নেই।',
+  'onboarding.slide2Body': 'JSON ক্যাটালগ রেপো যোগ করুন ও একসাথে ব্রাউজ করুন। কোনো সার্ভারে অ্যাকাউন্ট নেই।',
   'onboarding.slide3Title': 'গোপনীয়তা প্রথমে',
   'onboarding.slide3Body':
       'আপনার লাইব্রেরি, ইতিহাস ও ব্যাকআপ আপনার ডিভাইসেই থাকে। চাবি আপনার হাতে।',
@@ -122,8 +116,7 @@ const Map<String, String> bnStrings = {
   'home.myList': 'আমার তালিকা',
   'home.becauseYouWatched': 'আপনি দেখেছেন বলে',
   'home.emptyTitle': 'এখানে এখনো কিছু নেই',
-  'home.emptyBody':
-      'হোম স্ক্রিন ভরতে সেটিংস থেকে একটি প্রোভাইডার যোগ করুন।',
+  'home.emptyBody': 'হোম স্ক্রিন ভরতে সেটিংস থেকে একটি প্রোভাইডার যোগ করুন।',
 
   // Search
   'search.title': 'খুঁজুন',
@@ -158,7 +151,8 @@ const Map<String, String> bnStrings = {
   // Library
   'library.title': 'লাইব্রেরি',
   'library.myListEmpty': 'আপনার তালিকা খালি',
-  'library.myListEmptyBody': 'যেকোনো টাইটেলে বুকমার্ক ট্যাপ করে এখানে সংরক্ষণ করুন।',
+  'library.myListEmptyBody':
+      'যেকোনো টাইটেলে বুকমার্ক ট্যাপ করে এখানে সংরক্ষণ করুন।',
   'library.favoritesEmpty': 'এখনো কোনো প্রিয় নেই',
   'library.favoritesEmptyBody': 'যেকোনো টাইটেলে হার্ট ট্যাপ করে প্রিয় করুন।',
   'library.historyEmpty': 'এখনো কোনো ইতিহাস নেই',
@@ -203,8 +197,7 @@ const Map<String, String> bnStrings = {
 
   // Providers
   'providers.title': 'প্রোভাইডার',
-  'providers.subtitle':
-      'প্রোভাইডার হলো JSON ক্যাটালগ। রেপো URL যোগ করে এর অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া ব্রাউজ করুন।',
+  'providers.subtitle': 'প্রোভাইডার হলো JSON ক্যাটালগ। রেপো URL যোগ করে এর অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া ব্রাউজ করুন।',
   'providers.addProvider': 'প্রোভাইডার যোগ করুন',
   'providers.providerName': 'প্রোভাইডারের নাম',
   'providers.providerUrl': 'রেপো JSON URL',
@@ -232,8 +225,7 @@ const Map<String, String> bnStrings = {
   'providers.providerRefreshed': 'প্রোভাইডার রিফ্রেশ হয়েছে',
   'providers.refreshFailed': 'রিফ্রেশ হয়নি',
   'providers.noAddedRepos': 'এখনো কোনো প্রোভাইডার যোগ হয়নি',
-  'providers.noAddedReposBody':
-      'নমুনার পাশাপাশি আরেকটি ক্যাটালগ ব্রাউজ করতে রেপো URL যোগ করুন বা JSON পেস্ট করুন।',
+  'providers.noAddedReposBody': 'নমুনার পাশাপাশি আরেকটি ক্যাটালগ ব্রাউজ করতে রেপো URL যোগ করুন বা JSON পেস্ট করুন।',
   'providers.neverFetched': 'কখনো আপডেট হয়নি',
   'providers.cantDeleteBuiltIn':
       'বিল্ট-ইন ক্যাটালগ সরানো যাবে না, তবে বন্ধ করা যাবে।',
@@ -252,8 +244,7 @@ const Map<String, String> bnStrings = {
   'player.resumeFrom': '{time} থেকে চালিয়ে যান',
   'player.markWatched': 'দেখা হয়েছে চিহ্নিত করুন',
   'player.noVideo': 'এই পর্বের কোনো ভিডিও নেই।',
-  'player.itemNotFound':
-      'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
+  'player.itemNotFound': 'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
   'player.videoFailed':
       'এই ভিডিওটি চালানো যাচ্ছে না। সংযোগ যাচাই করুন বা অন্য পর্ব চেষ্টা করুন।',
   'player.skipBack10': '১০ সেকেন্ড পেছনে',
@@ -278,37 +269,30 @@ const Map<String, String> bnStrings = {
   'reader.brightness': 'উজ্জ্বলতা',
   'reader.chapters': 'অধ্যায়সমূহ',
   'reader.pagesCount': '{count} পৃষ্ঠা',
-  'reader.itemNotFound':
-      'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
+  'reader.itemNotFound': 'এই টাইটেলটি পাওয়া যায়নি। হয়তো আপনার প্রোভাইডার থেকে সরিয়ে ফেলা হয়েছে।',
   'reader.failedToLoadPage': 'এই পৃষ্ঠাটি লোড করা যায়নি।',
 
   // Backup
   'backup.title': 'ব্যাকআপ ও পুনরুদ্ধার',
-  'backup.subtitle':
-      'আপনার লাইব্রেরি, ইতিহাস ও সেটিংসের এনক্রিপ্টেড ব্যাকআপ নিন। আপনার ডিভাইস কোড দিয়ে এটি খুলবে।',
+  'backup.subtitle': 'আপনার লাইব্রেরি, ইতিহাস ও সেটিংসের এনক্রিপ্টেড ব্যাকআপ নিন। আপনার ডিভাইস কোড দিয়ে এটি খুলবে।',
   'backup.export': 'ব্যাকআপ নিন',
   'backup.import': 'ব্যাকআপ ফেরান',
   'backup.exported': 'ব্যাকআপ নেওয়া হয়েছে',
   'backup.imported': 'ব্যাকআপ ফেরানো হয়েছে',
   'backup.failed': 'ব্যাকআপ হয়নি। আবার চেষ্টা করুন।',
-  'backup.warning':
-      'ব্যাকআপ ফাইল ও ডিভাইস কোড একসাথে রাখুন — একটি ছাড়া অন্যটি দিয়ে কিছু ফেরানো যাবে না।',
+  'backup.warning': 'ব্যাকআপ ফাইল ও ডিভাইস কোড একসাথে রাখুন — একটি ছাড়া অন্যটি দিয়ে কিছু ফেরানো যাবে না।',
   'backup.chooseFile': 'ব্যাকআপ ফাইল বেছে নিন',
   'backup.noBackupFound': 'ফাইলটিতে কোনো ব্যাকআপ পাওয়া যায়নি।',
   'backup.restoreConfirm': 'বর্তমান ডেটা মুছে এই ব্যাকআপ দিয়ে বদলাবেন?',
-  'backup.restoreConfirmBody':
-      'ইমপোর্ট করলে ব্যাকআপের ডেটা দিয়ে আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস ও প্রোভাইডার বদলে যাবে। এটি আর ফেরানো যাবে না।',
+  'backup.restoreConfirmBody': 'ইমপোর্ট করলে ব্যাকআপের ডেটা দিয়ে আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস ও প্রোভাইডার বদলে যাবে। এটি আর ফেরানো যাবে না।',
   'backup.codePrompt': 'আপনার ডিভাইস কোড দিন',
   'backup.codePromptBody':
       'আপনার কোড এই ব্যাকআপটি লক করে। শুধু এই কোড দিয়েই এটি আবার খোলা যাবে।',
-  'backup.exportDesc':
-      'আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস, প্রোভাইডার ও সেটিংসের এনক্রিপ্টেড কপি .sbbackup ফাইলে সংরক্ষণ করুন।',
+  'backup.exportDesc': 'আপনার প্রোফাইল, লাইব্রেরি, ইতিহাস, প্রোভাইডার ও সেটিংসের এনক্রিপ্টেড কপি .sbbackup ফাইলে সংরক্ষণ করুন।',
   'backup.importDesc':
       'আগে নেওয়া .sbbackup ফাইল থেকে সবকিছু ফেরান। বর্তমান ডেটা বদলে যাবে।',
-  'backup.codeAloneNote':
-      'কোনো সার্ভার নেই: শুধু কোড দিয়ে নতুন ডিভাইসে ডেটা আনা যাবে না। ব্যাকআপ ফাইলটিই বাহক — ফাইল ও কোড একসাথে রাখুন।',
-  'backup.wrongCode':
-      'এই কোড দিয়ে ব্যাকআপটি খোলা যায়নি। কোড যাচাই করুন, অথবা ফাইলটি নষ্ট হতে পারে।',
+  'backup.codeAloneNote': 'কোনো সার্ভার নেই: শুধু কোড দিয়ে নতুন ডিভাইসে ডেটা আনা যাবে না। ব্যাকআপ ফাইলটিই বাহক — ফাইল ও কোড একসাথে রাখুন।',
+  'backup.wrongCode': 'এই কোড দিয়ে ব্যাকআপটি খোলা যায়নি। কোড যাচাই করুন, অথবা ফাইলটি নষ্ট হতে পারে।',
   'backup.invalidFile': 'ফাইলটি StreamBox ব্যাকআপ বলে মনে হচ্ছে না।',
   'backup.exportCancelled': 'এক্সপোর্ট বাতিল হয়েছে।',
   'backup.exporting': 'ব্যাকআপ এনক্রিপ্ট হচ্ছে…',
@@ -395,20 +379,23 @@ const Map<String, String> bnStrings = {
   'profile.providers': 'আমার প্রোভাইডার',
   'profile.developer': 'ডেভেলপার',
   'profile.developerName': 'Jarif Ahmed',
-  'profile.codeHint':
-      'আপনার ডিভাইস কোড এই ডিভাইসে সংরক্ষিত আছে। দেখতে Settings → Backup & restore-এ যান।',
+  'profile.codeHint': 'আপনার ডিভাইস কোড এই ডিভাইসে সংরক্ষিত আছে। দেখতে Settings → Backup & restore-এ যান।',
   'profile.viewCode': 'কোড দেখুন',
   'profile.noProfile': 'এখনো কোনো প্রোফাইল নেই',
   'profile.signOutFailed': 'সাইন আউট করা যায়নি। আবার চেষ্টা করুন।',
+
+  // Developer
+  'developer.role': 'StreamBox-এর ডেভেলপার ও প্রতিষ্ঠাতা',
+  'developer.bio':
+      'জারিফ StreamBox বানিয়েছেন — অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়ার জন্য একটি বিনামূল্যের, ডিভাইস-কেন্দ্রিক অ্যাপ। সবকিছু আপনার ডিভাইসেই থাকে: কোনো সার্ভার নেই, কোনো ক্লাউড অ্যাকাউন্ট নেই — শুধু আপনার নিজের ক্যাটালগ, আপনার মতো করে।',
 
   // Settings
   'settings.notificationsNote':
       'শুধু অ্যাপের ভেতরের নোটিফিকেশন — এই সংস্করণে পুশ নোটিফিকেশন নেই।',
   'settings.developer': 'ডেভেলপার',
   'settings.developerName': 'Jarif Ahmed',
-  'settings.aboutBody':
-      'StreamBox আপনার নিজের JSON প্রোভাইডার ক্যাটালগ থেকে অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া এক জায়গায় নিয়ে আসে। আপনার সব তথ্য এই ডিভাইসেই থাকে — কোনো সার্ভার অ্যাকাউন্ট নেই।',
-  'settings.aboutVersion': 'সংস্করণ ০.১.০',
+  'settings.aboutBody': 'StreamBox আপনার নিজের JSON প্রোভাইডার ক্যাটালগ থেকে অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া এক জায়গায় নিয়ে আসে। আপনার সব তথ্য এই ডিভাইসেই থাকে — কোনো সার্ভার অ্যাকাউন্ট নেই।',
+  'settings.aboutVersion': 'সংস্করণ ১.০.৪',
 
   // Details
   'details.notFoundTitle': 'শিরোনাম পাওয়া যায়নি',
@@ -422,6 +409,7 @@ const Map<String, String> bnStrings = {
   'details.noPages': 'এই শিরোনামের কোনো পৃষ্ঠা নেই।',
   'details.resumeEpisode': 'পর্ব {number} থেকে চালিয়ে যান',
   'details.resumeChapter': 'অধ্যায় {number} থেকে চালিয়ে যান',
+  'details.resume': 'চালিয়ে যান',
   'details.statusUnknown': 'অজানা',
   'details.pagesCount': '{count} পৃষ্ঠা',
 };

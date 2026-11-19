@@ -24,6 +24,11 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
   String? _refreshingId;
   bool _refreshingAll = false;
 
+  /// Repo ids with a toggle in flight. Rapid taps used to fire overlapping
+  /// toggles whose completion order (not tap order) decided the final
+  /// state — ignore taps until the in-flight toggle lands.
+  final _togglingIds = <String>{};
+
   void _showMessage(String message, {bool isError = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -108,13 +113,17 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
   }
 
   Future<void> _toggleRepo(ProviderRepo repo, bool enabled) async {
+    if (_togglingIds.contains(repo.id)) return;
     final errorMessage = tr(context, 'common.errorGeneric');
+    _togglingIds.add(repo.id);
     try {
       await ref.read(providersListProvider.notifier).toggle(repo.id, enabled);
     } on RepoException catch (e) {
       _showMessage(e.message, isError: true);
     } catch (_) {
       _showMessage(errorMessage, isError: true);
+    } finally {
+      _togglingIds.remove(repo.id);
     }
   }
 
@@ -137,7 +146,9 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
                   )
                 : const Icon(Iconsax.refresh),
             tooltip: tr(context, 'providers.refreshAll'),
-            onPressed: _refreshingAll ? null : _refreshAll,
+            // With no repos the button used to be live and reported a
+            // misleading "Provider refreshed" for refreshing nothing.
+            onPressed: (_refreshingAll || repos.isEmpty) ? null : _refreshAll,
           ),
         ],
       ),
@@ -375,7 +386,10 @@ class _RepoCard extends StatelessWidget {
                   icon: const Icon(Iconsax.trash, size: 20),
                   color: AppColors.danger,
                   tooltip: tr(context, 'providers.removeProvider'),
-                  onPressed: onDelete,
+                  // Deleting while a refresh is in flight resurrects the
+                  // repo: the refresh re-persists the row after the delete
+                  // lands. Disable delete until the refresh finishes.
+                  onPressed: isRefreshing ? null : onDelete,
                 ),
             ],
           ),

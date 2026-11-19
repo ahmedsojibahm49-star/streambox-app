@@ -5,6 +5,11 @@ fetched over HTTP(S) and parsed into anime, movie, manga and manhwa titles.
 There are no extensions, no scrapers and no video-URL extraction — a repo is
 just a list of titles with the links the repo author chose to include.
 
+One JSON file may hold **one catalog or several providers** (multi-catalog,
+v1.0.4): each provider in the file becomes its own row in Settings →
+Providers, which you can enable/disable/delete individually. See
+[Multi-catalog files](#multi-catalog-files).
+
 - Bundled example: `assets/sample-repo.json` (also at the project root as
   `sample-repo.json`, ready to host). In the app, **Settings → Providers →
   Add provider → Paste JSON → Load example** fills it in.
@@ -66,15 +71,89 @@ just a list of titles with the links the repo author chose to include.
 }
 ```
 
+## Multi-catalog files
+
+A single JSON file can carry several providers. Two shapes are accepted —
+an object with a `providers` list, or a top-level array of catalog objects.
+Each catalog has the same shape as a single-catalog file (`name` + `items`,
+see the field table below), and each becomes its own repo row with its own
+item count, toggle and delete button. Refreshing any row re-syncs every
+provider from that file; a provider removed from the file disappears from
+the list on the next refresh.
+
+```json
+{
+  "providers": [
+    {
+      "name": "Anime Hub",
+      "items": [
+        {
+          "id": "last-horizon",
+          "type": "anime",
+          "title": "Last Horizon",
+          "year": 2025,
+          "episodes": [
+            {
+              "number": 1,
+              "title": "The Sea That Moves",
+              "videoUrl": "https://example.com/videos/last-horizon-e1.mp4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Manga Vault",
+      "items": [
+        {
+          "id": "paper-moons",
+          "type": "manga",
+          "title": "Paper Moons",
+          "year": 2022,
+          "chapters": [
+            {
+              "number": 1,
+              "title": "The First Fold",
+              "pageUrls": ["https://example.com/pages/paper-moons-1-1.jpg"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+The same two providers as a top-level array:
+
+```json
+[
+  { "name": "Anime Hub", "items": [ /* … */ ] },
+  { "name": "Manga Vault", "items": [ /* … */ ] }
+]
+```
+
+Rules for multi-catalog files:
+
+- Every catalog needs its own `name` and `items` — the same validation
+  rules apply per catalog, and an error names the catalog that failed,
+  e.g. `Provider #2 is missing a "name".`
+- Item ids only need to be unique *within* their own catalog — two
+  catalogs in one file may both have an item with id `show-1`.
+- Max 50 providers per file; each catalog still caps at 1000 items.
+- A file that grows from one catalog to several keeps the first catalog's
+  id, so library entries and history for it survive.
+
 ## Field table
 
 ### Top level
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `name` | string | **yes** | Display name in Settings → Providers. Max 100 characters. |
+| `name` | string | **yes** | Display name in Settings → Providers. Max 100 characters. Required for a single-catalog file and for every catalog in a multi-catalog file. |
 | `version` | integer | no | Informational only; the parser ignores it. |
-| `items` | array of item objects | **yes** | May be empty (`[]`), max 1000 items. |
+| `items` | array of item objects | **yes** | May be empty (`[]`), max 1000 items. Required per catalog. |
+| `providers` | array of catalog objects | no | Multi-catalog shape: when present, the file holds one provider per entry (max 50) and the top-level `name`/`items` are not used. |
 
 ### Item
 
@@ -113,15 +192,20 @@ just a list of titles with the links the repo author chose to include.
 
 ## Validation rules
 
-The parser rejects the whole repo (nothing is saved) when any rule fails,
-and the error message names the exact item and field — e.g.
+The parser rejects the whole file (nothing is saved) when any rule fails,
+and the error message names the exact problem — e.g.
 `Item "last-horizon" has an unknown type "series". Use one of: anime, movie,
-manga, manhwa.`
+manga, manhwa.` In a multi-catalog file the message also names the catalog,
+e.g. `Provider #2 ("Manga Vault"): Item "paper-moons" …`.
 
-- The file must be valid JSON and the root must be an object.
-- `name` must be a non-empty string (max 100 chars).
-- `items` must be present and be a list.
-- Every item needs a non-empty `id` (unique in the repo), a non-empty
+- The file must be valid JSON. A leading UTF-8 byte-order mark (BOM, as
+  saved by Windows Notepad) is tolerated.
+- The root must be a single-catalog object (`{"name": …, "items": […]}`),
+  a multi-catalog object (`{"providers": […]}`), or a top-level array of
+  catalog objects.
+- `name` must be a non-empty string (max 100 chars), per catalog.
+- `items` must be present and be a list, per catalog.
+- Every item needs a non-empty `id` (unique in its catalog), a non-empty
   `title`, and a `type` of `anime` / `movie` / `manhwa` / `manga`.
 - `year` must be a whole number; `rating` a number from 0 to 10; `genres`
   an array of strings; `posterUrl` / `backdropUrl` / `overview` / `status`
@@ -130,12 +214,17 @@ manga, manhwa.`
   `youtubeId` must be strings and `durationSeconds` an integer when present.
 - Every chapter needs an integer `number`; `title` must be a string and
   `pageUrls` an array of strings when present.
+- A file that looks like an **extension index** (entries with `pkg` / `apk`
+  / `packageName` fields, or `extensions` / `apps` lists) is rejected with
+  a message saying extension files are not supported. Providers are JSON
+  catalogs of titles — see [Boundaries](#boundaries).
 
 ## Caps
 
 | Limit | Value | What happens when exceeded |
 |---|---|---|
 | Repo file size | 5 MB | Fetch fails: "This repo file is too large…" |
+| Providers per file | 50 | Parse fails naming the count. |
 | Items per repo | 1000 | Parse fails naming the count. |
 | Episodes / chapters per item | 1000 | Parse fails naming the item. |
 | Fetch timeout | 15 s | Fetch fails: "The request timed out…" |
@@ -160,15 +249,16 @@ The app requires the URL to end in `.json`.
 1. **Settings → Providers → Add provider.**
 2. **Add via URL** — paste the `https://…/*.json` URL and tap Add provider.
    The app fetches it, validates it, and shows the exact error if anything
-   is wrong.
+   is wrong. A multi-catalog file adds one row per provider.
 3. **Paste JSON** — paste the JSON text directly. Useful for hosts whose
    URLs don't end in `.json`. Pasted repos can't be refreshed later — remove
    and re-add them with the new JSON. **Load example** fills in the bundled
-   sample repo so you can see the format.
+   sample repo (single-catalog) so you can see the format.
 
 Repo rows show the item count and last-updated time. The toggle disables a
 repo (its items disappear from Home/Search but stay cached). **Refresh**
-re-downloads the file and replaces that repo's items. The built-in Sample
+re-downloads the file and replaces that repo's items — for a multi-catalog
+file it re-syncs every provider from the file at once. The built-in Sample
 Catalog can't be deleted, but it can be turned off.
 
 ## Boundaries

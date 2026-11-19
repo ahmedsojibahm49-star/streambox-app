@@ -226,7 +226,7 @@ class _MangaScreenState extends ConsumerState<MangaScreen> {
                       ? EmptyState(
                           title: tr(context, 'search.noResultsTitle'),
                           body: tr(context, 'search.noResultsBody'),
-                          icon: Iconsax.search_normal,
+                          icon: Iconsax.search_normal_copy,
                           actionLabel: tr(context, 'search.clearFilters'),
                           onAction: () => setState(() {
                             _query = '';

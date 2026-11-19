@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../data/sample_provider.dart';
 import '../../i18n/i18n.dart';
+import '../../models/models.dart';
 import '../../providers/catalog_providers.dart';
 import '../../services/provider_service.dart';
 import '../../theme/app_theme.dart';
@@ -29,17 +30,38 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
   final _urlController = TextEditingController();
   final _jsonController = TextEditingController();
   final _urlFormKey = GlobalKey<FormState>();
+  final _urlErrorKey = GlobalKey();
+  final _jsonErrorKey = GlobalKey();
   bool _busy = false;
   String? _error;
+  int _lastTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // The error box is shared by both tabs: clear it when the user switches
+    // tab (a URL error must not sit under the JSON field, and vice versa)
+    // and when the user starts editing again.
+    _tabController.addListener(_onTabChanged);
+    _urlController.addListener(_clearErrorOnEdit);
+    _jsonController.addListener(_clearErrorOnEdit);
+  }
+
+  void _onTabChanged() {
+    if (_tabController.index != _lastTabIndex) {
+      _lastTabIndex = _tabController.index;
+      if (_error != null) setState(() => _error = null);
+    }
+  }
+
+  void _clearErrorOnEdit() {
+    if (_error != null) setState(() => _error = null);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     _urlController.dispose();
     _jsonController.dispose();
@@ -56,26 +78,61 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
     );
   }
 
+  /// Success message for an add: the plain "Provider added" for one repo,
+  /// plus the added names when a multi-catalog file added several rows
+  /// (names are user data, so no new i18n key is needed).
+  String _addedMessage(List<ProviderRepo> repos) {
+    final added = tr(context, 'providers.providerAdded');
+    if (repos.length <= 1) return added;
+    return '$added: ${repos.map((repo) => repo.name).join(', ')}';
+  }
+
+  /// Scroll the error box into view. The box sits below a 14-line text
+  /// field on the JSON tab, so on a small screen a validation failure used
+  /// to land below the fold and look like nothing happened ("no plugin
+  /// appeared") — the error must be visible, not just present.
+  void _scrollToError(GlobalKey key) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final errorContext = key.currentContext;
+      if (errorContext != null) {
+        Scrollable.ensureVisible(
+          errorContext,
+          duration: const Duration(milliseconds: 300),
+          alignment: 0.5,
+        );
+      }
+    });
+  }
+
+  void _setError(String message, GlobalKey errorKey) {
+    if (!mounted) return;
+    setState(() => _error = message);
+    _scrollToError(errorKey);
+  }
+
   Future<void> _addFromUrl() async {
+    // Guard against double-submit: the button is disabled while busy, but
+    // the keyboard's Done key (onSubmitted) could still re-fire.
+    if (_busy) return;
     if (!_urlFormKey.currentState!.validate()) return;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await ref
+      final repos = await ref
           .read(providersListProvider.notifier)
           .addFromUrl(_urlController.text.trim());
       if (!mounted) return;
-      _showMessage(tr(context, 'providers.providerAdded'));
+      _showMessage(_addedMessage(repos));
       context.pop();
     } on RepoException catch (e) {
-      if (mounted) setState(() => _error = e.message);
+      _setError(e.message, _urlErrorKey);
     } catch (_) {
       // Non-repo failures (e.g. a Hive write error) used to be unhandled
       // async errors — show a generic message instead.
       if (mounted) {
-        setState(() => _error = tr(context, 'common.errorGeneric'));
+        _setError(tr(context, 'common.errorGeneric'), _urlErrorKey);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -83,9 +140,10 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
   }
 
   Future<void> _addFromJson() async {
+    if (_busy) return;
     final rawJson = _jsonController.text.trim();
     if (rawJson.isEmpty) {
-      setState(() => _error = tr(context, 'validation.required'));
+      _setError(tr(context, 'validation.required'), _jsonErrorKey);
       return;
     }
     setState(() {
@@ -93,17 +151,17 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
       _error = null;
     });
     try {
-      await ref
+      final repos = await ref
           .read(providersListProvider.notifier)
           .addFromJson(rawJson);
       if (!mounted) return;
-      _showMessage(tr(context, 'providers.providerAdded'));
+      _showMessage(_addedMessage(repos));
       context.pop();
     } on RepoException catch (e) {
-      if (mounted) setState(() => _error = e.message);
+      _setError(e.message, _jsonErrorKey);
     } catch (_) {
       if (mounted) {
-        setState(() => _error = tr(context, 'common.errorGeneric'));
+        _setError(tr(context, 'common.errorGeneric'), _jsonErrorKey);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -113,6 +171,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
   /// Fill the JSON field with the bundled sample repo JSON. Falls back to
   /// the in-code sample data if the asset cannot be loaded.
   Future<void> _loadExample() async {
+    if (_busy) return;
     final loadedMessage = tr(context, 'providers.exampleLoaded');
     String example;
     try {
@@ -190,7 +249,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
             ),
             if (_error != null) ...[
               const SizedBox(height: 16),
-              _ErrorBox(message: _error!),
+              _ErrorBox(key: _urlErrorKey, message: _error!),
             ],
             const SizedBox(height: 20),
             GradientButton(
@@ -228,7 +287,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
               const SizedBox(width: 8),
               GhostButton(
                 label: tr(context, 'providers.loadExample'),
-                onPressed: _loadExample,
+                onPressed: _busy ? null : _loadExample,
                 width: 140,
                 height: 40,
               ),
@@ -252,7 +311,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
           ),
           if (_error != null) ...[
             const SizedBox(height: 16),
-            _ErrorBox(message: _error!),
+            _ErrorBox(key: _jsonErrorKey, message: _error!),
           ],
           const SizedBox(height: 20),
           GradientButton(
@@ -271,7 +330,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
 
 /// Red error box showing a specific [RepoException] message.
 class _ErrorBox extends StatelessWidget {
-  const _ErrorBox({required this.message});
+  const _ErrorBox({super.key, required this.message});
 
   final String message;
 
