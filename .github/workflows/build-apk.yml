@@ -2,7 +2,10 @@ name: Build APK
 
 # Builds a release APK on every push to main and on manual dispatch.
 # The APK is uploaded as an artifact (streambox-apk) — download it from the
-# Actions run, or from the release the verification agent wires up later.
+# Actions run. When a version tag (v1.0.0, v1.1.0, ...) is pushed, the APK is
+# ALSO published as a GitHub Release with the APK attached.
+#
+# To publish a release: git tag v1.0.0 && git push origin v1.0.0
 #
 # NOTE: this workflow does NOT run build_runner. Hive adapters (*.g.dart) are
 # committed to the repo; if a workstream adds a model or a HiveField without
@@ -13,11 +16,14 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    tags: ['v*']
 
 jobs:
   build-apk:
     name: Build release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,3 +56,18 @@ jobs:
         with:
           name: streambox-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Rename APK for release
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cp build/app/outputs/flutter-apk/app-release.apk streambox-${{ github.ref_name }}.apk
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: streambox-${{ github.ref_name }}.apk
+          name: StreamBox ${{ github.ref_name }}
+          body: |
+            StreamBox — provider-based anime, movies & manga app (Flutter).
+            Install the APK below (allow "Install unknown apps" when asked).
+            Sign up to get your unique login code, then add a provider repo from Settings → Providers.
