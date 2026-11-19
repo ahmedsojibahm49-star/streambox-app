@@ -239,8 +239,15 @@ class LocalAuthService implements AuthService {
   @override
   Future<bool> isLoggedIn() async {
     if (!_profileBox.containsKey('current')) return false;
-    final session = await _credentials.read(CredentialKeys.sessionActive);
-    return session == '1';
+    try {
+      final session = await _credentials.read(CredentialKeys.sessionActive);
+      return session == '1';
+    } catch (_) {
+      // Secure storage unreadable on this device (broken KeyStore) — treat
+      // as logged out instead of crashing startup. The user can log in
+      // again; if writes work, the session is stored normally.
+      return false;
+    }
   }
 
   @override
@@ -263,15 +270,27 @@ class LocalAuthService implements AuthService {
 
   @override
   Future<bool> verifyCode(String code) async {
-    final storedHash = await _credentials.read(CredentialKeys.codeHash);
-    if (storedHash == null) return false;
-    return _hashCode(code) == storedHash;
+    try {
+      final storedHash = await _credentials.read(CredentialKeys.codeHash);
+      if (storedHash == null) return false;
+      return _hashCode(code) == storedHash;
+    } catch (_) {
+      // Secure storage unreadable — report the code as wrong instead of
+      // crashing the login flow.
+      return false;
+    }
   }
 
   @override
   Future<bool> hasSeenOnboarding() async {
-    final seen = await _credentials.read(CredentialKeys.onboardingSeen);
-    return seen == '1';
+    try {
+      final seen = await _credentials.read(CredentialKeys.onboardingSeen);
+      return seen == '1';
+    } catch (_) {
+      // Secure storage unreadable — show onboarding instead of crashing
+      // startup. The flag is re-written when onboarding finishes.
+      return false;
+    }
   }
 
   @override

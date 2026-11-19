@@ -26,15 +26,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _route());
   }
 
+  /// Session check with hard timeouts: on some Android devices the secure
+  /// storage read can hang (KeyStore) or throw — without a timeout the
+  /// splash would spin forever and the app would look stuck (or, if the
+  /// first frame never completed, white). Every failure degrades to
+  /// "logged out, onboarding unseen" and the app ALWAYS routes.
   Future<void> _route() async {
     final auth = ref.read(authServiceProvider);
-    final loggedIn = await ref.read(authStateProvider.notifier).refresh();
+    bool loggedIn = false;
+    try {
+      loggedIn = await ref
+          .read(authStateProvider.notifier)
+          .refresh()
+          .timeout(const Duration(seconds: 8));
+    } catch (_) {
+      loggedIn = false;
+    }
     if (!mounted) return;
     if (loggedIn) {
       context.go('/home');
       return;
     }
-    final seenOnboarding = await auth.hasSeenOnboarding();
+    bool seenOnboarding = false;
+    try {
+      seenOnboarding =
+          await auth.hasSeenOnboarding().timeout(const Duration(seconds: 8));
+    } catch (_) {
+      seenOnboarding = false;
+    }
     if (!mounted) return;
     context.go(seenOnboarding ? '/welcome' : '/onboarding');
   }
