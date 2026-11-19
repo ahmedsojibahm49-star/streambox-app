@@ -14,6 +14,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    lint {
+        // Android Lint crashes on the video_player_android plugin during
+        // release builds (:video_player_android:lintVitalAnalyzeRelease fails
+        // with a NoSuchMethodError inside lint's own JavaDocParser — a bug in
+        // lint, not in our code). Disable release lint checks so the APK
+        // build is not blocked by it.
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.kizoo.streambox"
