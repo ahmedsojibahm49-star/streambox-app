@@ -33,7 +33,7 @@ Future<void> showCodePopup(
               shape: BoxShape.circle,
               boxShadow: AppColors.glowShadow,
             ),
-            child: const Icon(Iconsax.key, size: 28, color: Colors.white),
+            child: const Icon(Iconsax.key_copy, size: 28, color: Colors.white),
           ),
           const SizedBox(height: 16),
           Text(
@@ -71,7 +71,7 @@ Future<void> showCodePopup(
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Iconsax.copy, size: 20),
+                  icon: const Icon(Iconsax.copy_copy, size: 20),
                   tooltip: tr(context, 'auth.codeCopied'),
                   onPressed: () async {
                     // Clipboard is a platform-channel call — guard it

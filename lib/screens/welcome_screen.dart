@@ -100,13 +100,13 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 32),
                   GradientButton(
                     label: tr(context, 'auth.createAccount'),
-                    icon: Iconsax.user,
+                    icon: Iconsax.user_copy,
                     onPressed: () => context.push('/signup'),
                   ),
                   const SizedBox(height: 12),
                   GhostButton(
                     label: tr(context, 'auth.login'),
-                    icon: Iconsax.login_1,
+                    icon: Iconsax.login_1_copy,
                     onPressed: () => context.push('/login'),
                   ),
                 ],

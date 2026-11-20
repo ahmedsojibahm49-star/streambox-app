@@ -288,12 +288,12 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   segments: [
                     ButtonSegment<ReaderMode>(
                       value: ReaderMode.page,
-                      icon: const Icon(Iconsax.book_1, size: 18),
+                      icon: const Icon(Iconsax.book_1_copy, size: 18),
                       label: Text(tr(context, 'reader.pageTurn')),
                     ),
                     ButtonSegment<ReaderMode>(
                       value: ReaderMode.vertical,
-                      icon: const Icon(Iconsax.arrow_down_1, size: 18),
+                      icon: const Icon(Iconsax.arrow_down_1_copy, size: 18),
                       label: Text(tr(context, 'reader.verticalScroll')),
                     ),
                   ],
@@ -328,7 +328,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  const Icon(Iconsax.sun_1, size: 20),
+                  const Icon(Iconsax.sun_1_copy, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     tr(context, 'reader.brightness'),
@@ -546,7 +546,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       backgroundColor: palette.bg,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left),
+          icon: const Icon(Iconsax.arrow_left_copy),
           onPressed: () => context.pop(),
         ),
       ),
@@ -557,7 +557,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
-                Iconsax.book_1,
+                Iconsax.book_1_copy,
                 size: 48,
                 color: AppColors.brand,
               ),
@@ -580,7 +580,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       backgroundColor: palette.bg,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left),
+          icon: const Icon(Iconsax.arrow_left_copy),
           onPressed: () => context.pop(),
         ),
         title: Text(_item?.title ?? ''),
@@ -592,7 +592,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
-                Iconsax.book_1,
+                Iconsax.book_1_copy,
                 size: 48,
                 color: AppColors.brand,
               ),
@@ -617,7 +617,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Iconsax.book_1,
+                      const Icon(Iconsax.book_1_copy,
                           size: 18, color: Colors.white),
                       const SizedBox(width: 8),
                       Text(
@@ -768,7 +768,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                     child: Row(
                       children: [
                         _chromeIconButton(
-                          icon: Iconsax.arrow_left,
+                          icon: Iconsax.arrow_left_copy,
                           label: tr(context, 'common.back'),
                           onPressed: () => context.pop(),
                         ),
@@ -802,13 +802,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                           ),
                         ),
                         _chromeIconButton(
-                          icon: Iconsax.book_1,
+                          icon: Iconsax.book_1_copy,
                           label: tr(context, 'reader.chapters'),
                           onPressed: _showChapterList,
                         ),
                         const SizedBox(width: 8),
                         _chromeIconButton(
-                          icon: Iconsax.setting_2,
+                          icon: Iconsax.setting_2_copy,
                           label: tr(context, 'reader.settings'),
                           onPressed: _showSettingsSheet,
                         ),
@@ -845,7 +845,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                                 context,
                                 'reader.previousChapter',
                               ),
-                              icon: Iconsax.arrow_left_1,
+                              icon: Iconsax.arrow_left_1_copy,
                               onPressed: previousChapterIndex(_chapterIndex) ==
                                       null
                                   ? null
@@ -873,7 +873,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                             const Spacer(),
                             _chromeTextButton(
                               label: tr(context, 'reader.nextChapter'),
-                              icon: Iconsax.arrow_right_1,
+                              icon: Iconsax.arrow_right_1_copy,
                               iconAfterLabel: true,
                               onPressed: nextChapterIndex(
                                         _chapters.length,
@@ -1033,7 +1033,7 @@ class _ReaderPageImage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
-              Iconsax.warning_2,
+              Iconsax.warning_2_copy,
               size: 32,
               color: Colors.white54,
             ),

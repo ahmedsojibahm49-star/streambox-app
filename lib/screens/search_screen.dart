@@ -192,7 +192,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ListTile(
                 title: Text(tr(context, _sortKey(option))),
                 trailing: _sort == option
-                    ? const Icon(Iconsax.tick_circle, color: AppColors.brand)
+                    ? const Icon(Iconsax.tick_circle_copy, color: AppColors.brand)
                     : null,
                 onTap: () => Navigator.of(context).pop(option),
               ),
@@ -387,7 +387,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return EmptyState(
       title: tr(context, 'search.noCatalogTitle'),
       body: tr(context, 'search.noCatalogBody'),
-      icon: Iconsax.folder_open,
+      icon: Iconsax.folder_open_copy,
       actionLabel: tr(context, 'home.addProvider'),
       onAction: () => context.push('/settings/providers'),
     );
@@ -435,7 +435,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ChipToggle(
                     label: query,
                     selected: false,
-                    icon: Iconsax.clock,
+                    icon: Iconsax.clock_copy,
                     onTap: () => _searchRecent(query),
                   ),
               ],
@@ -522,7 +522,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Iconsax.sort, size: 16, color: AppColors.brand),
+                    const Icon(Iconsax.sort_copy, size: 16, color: AppColors.brand),
                     const SizedBox(width: 4),
                     Text(
                       tr(context, _sortKey(_sort)),
@@ -655,7 +655,7 @@ class _FilterButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Iconsax.filter,
+              Iconsax.filter_copy,
               size: 18,
               color: activeCount > 0 ? AppColors.brand : palette.text,
             ),

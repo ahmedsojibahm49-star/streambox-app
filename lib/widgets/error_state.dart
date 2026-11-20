@@ -34,7 +34,7 @@ class ErrorState extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Iconsax.warning_2,
+                Iconsax.warning_2_copy,
                 size: 32,
                 color: AppColors.danger,
               ),

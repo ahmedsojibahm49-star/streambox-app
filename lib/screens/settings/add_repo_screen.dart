@@ -198,11 +198,11 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
           indicatorColor: AppColors.brand,
           tabs: [
             Tab(
-              icon: const Icon(Iconsax.link_1, size: 20),
+              icon: const Icon(Iconsax.link_1_copy, size: 20),
               text: tr(context, 'providers.addViaUrl'),
             ),
             Tab(
-              icon: const Icon(Iconsax.document_text, size: 20),
+              icon: const Icon(Iconsax.document_text_copy, size: 20),
               text: tr(context, 'providers.addViaJson'),
             ),
           ],
@@ -238,7 +238,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
               controller: _urlController,
               label: tr(context, 'providers.providerUrl'),
               hint: tr(context, 'providers.providerUrlHint'),
-              prefixIcon: Iconsax.global,
+              prefixIcon: Iconsax.global_copy,
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => _addFromUrl(),
@@ -256,7 +256,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
               label: _busy
                   ? tr(context, 'providers.adding')
                   : tr(context, 'providers.addProvider'),
-              icon: Iconsax.add_circle,
+              icon: Iconsax.add_circle_copy,
               loading: _busy,
               onPressed: _busy ? null : _addFromUrl,
             ),
@@ -318,7 +318,7 @@ class _AddRepoScreenState extends ConsumerState<AddRepoScreen>
             label: _busy
                 ? tr(context, 'providers.adding')
                 : tr(context, 'providers.addProvider'),
-            icon: Iconsax.add_circle,
+            icon: Iconsax.add_circle_copy,
             loading: _busy,
             onPressed: _busy ? null : _addFromJson,
           ),
@@ -349,7 +349,7 @@ class _ErrorBox extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Iconsax.warning_2, size: 20, color: AppColors.danger),
+          const Icon(Iconsax.warning_2_copy, size: 20, color: AppColors.danger),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

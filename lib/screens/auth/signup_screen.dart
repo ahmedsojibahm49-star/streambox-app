@@ -94,7 +94,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   controller: _nameController,
                   label: tr(context, 'auth.name'),
                   hint: tr(context, 'auth.nameHint'),
-                  prefixIcon: Iconsax.user,
+                  prefixIcon: Iconsax.user_copy,
                   textInputAction: TextInputAction.next,
                   validator: (v) =>
                       _translate(Validators.displayName, v),
@@ -104,7 +104,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   controller: _emailController,
                   label: tr(context, 'auth.email'),
                   hint: tr(context, 'auth.emailHint'),
-                  prefixIcon: Iconsax.sms,
+                  prefixIcon: Iconsax.sms_copy,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: (v) => _translate(Validators.email, v),
@@ -114,13 +114,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   controller: _passwordController,
                   label: tr(context, 'auth.password'),
                   hint: tr(context, 'auth.passwordHint'),
-                  prefixIcon: Iconsax.lock,
+                  prefixIcon: Iconsax.lock_copy,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _submit(),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Iconsax.eye : Iconsax.eye_slash,
+                      _obscurePassword ? Iconsax.eye_copy : Iconsax.eye_slash_copy,
                       size: 20,
                     ),
                     tooltip: tr(
@@ -164,7 +164,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      Iconsax.shield_tick,
+                      Iconsax.shield_tick_copy,
                       size: 18,
                       color: palette.muted,
                     ),

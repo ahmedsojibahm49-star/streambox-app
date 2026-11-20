@@ -100,7 +100,7 @@ class DeveloperScreen extends StatelessWidget {
                           ),
                         ),
                         child: const Icon(
-                          Iconsax.code,
+                          Iconsax.code_copy,
                           size: 20,
                           color: AppColors.brand,
                         ),

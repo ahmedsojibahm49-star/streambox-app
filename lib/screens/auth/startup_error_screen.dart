@@ -149,8 +149,8 @@ class _StartupErrorScreenState extends State<StartupErrorScreen> {
                         onPressed: _copyError,
                         icon: Icon(
                           _copied
-                              ? Iconsax.copy_success
-                              : Iconsax.copy,
+                              ? Iconsax.copy_success_copy
+                              : Iconsax.copy_copy,
                           size: 18,
                           color: AppColors.brand,
                         ),

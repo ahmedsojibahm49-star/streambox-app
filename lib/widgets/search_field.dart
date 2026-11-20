@@ -67,7 +67,7 @@ class _SearchFieldState extends State<SearchField> {
             ? null
             : IconButton(
                 icon: Icon(
-                  Iconsax.close_circle,
+                  Iconsax.close_circle_copy,
                   size: 20,
                   color: palette.muted,
                 ),

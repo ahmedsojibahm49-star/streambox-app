@@ -115,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _emailController,
                   label: tr(context, 'auth.email'),
                   hint: tr(context, 'auth.emailHint'),
-                  prefixIcon: Iconsax.sms,
+                  prefixIcon: Iconsax.sms_copy,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: (v) => _translate(Validators.email, v),
@@ -125,12 +125,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _passwordController,
                   label: tr(context, 'auth.password'),
                   hint: tr(context, 'auth.passwordHint'),
-                  prefixIcon: Iconsax.lock,
+                  prefixIcon: Iconsax.lock_copy,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Iconsax.eye : Iconsax.eye_slash,
+                      _obscurePassword ? Iconsax.eye_copy : Iconsax.eye_slash_copy,
                       size: 20,
                     ),
                     tooltip: tr(
@@ -150,7 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _codeController,
                   label: tr(context, 'auth.deviceCode'),
                   hint: tr(context, 'auth.codeHint'),
-                  prefixIcon: Iconsax.key,
+                  prefixIcon: Iconsax.key_copy,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _submit(),
                   validator: _codeValidator,
@@ -160,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      Iconsax.info_circle,
+                      Iconsax.info_circle_copy,
                       size: 18,
                       color: palette.muted,
                     ),

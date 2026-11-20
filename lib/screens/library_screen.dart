@@ -29,7 +29,7 @@ class LibraryScreen extends ConsumerWidget {
             if (history.isNotEmpty)
               IconButton(
                 tooltip: tr(context, 'library.clearHistory'),
-                icon: const Icon(Iconsax.trash),
+                icon: const Icon(Iconsax.trash_copy),
                 onPressed: () => _confirmClearHistory(context, ref),
               ),
           ],
@@ -130,7 +130,7 @@ class _LibraryListTab extends ConsumerWidget {
               ? 'library.myListEmptyBody'
               : 'library.favoritesEmptyBody',
         ),
-        icon: isMyList ? Iconsax.bookmark : Iconsax.heart,
+        icon: isMyList ? Iconsax.bookmark_copy : Iconsax.heart_copy,
       );
     }
     return ListView.separated(
@@ -202,7 +202,7 @@ class _HistoryTab extends ConsumerWidget {
       return EmptyState(
         title: tr(context, 'library.historyEmpty'),
         body: tr(context, 'library.historyEmptyBody'),
-        icon: Iconsax.clock,
+        icon: Iconsax.clock_copy,
       );
     }
     return ListView.separated(
@@ -265,7 +265,7 @@ class _ContinueWatchingTab extends ConsumerWidget {
       return EmptyState(
         title: tr(context, 'library.continueEmpty'),
         body: tr(context, 'library.continueEmptyBody'),
-        icon: Iconsax.play_circle,
+        icon: Iconsax.play_circle_copy,
       );
     }
     return ListView.separated(
@@ -387,7 +387,7 @@ class _LibraryRow extends StatelessWidget {
             ),
             IconButton(
               tooltip: tr(context, 'common.remove'),
-              icon: Icon(Iconsax.close_circle, color: palette.muted),
+              icon: Icon(Iconsax.close_circle_copy, color: palette.muted),
               onPressed: onRemove,
             ),
           ],

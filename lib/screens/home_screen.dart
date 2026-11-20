@@ -98,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               EmptyState(
                 title: tr(context, 'home.emptyTitle'),
                 body: tr(context, 'home.emptyBody'),
-                icon: Iconsax.folder_open,
+                icon: Iconsax.folder_open_copy,
                 actionLabel: tr(context, 'home.addProvider'),
                 onAction: () => context.push('/settings/providers'),
               ),
@@ -238,8 +238,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // v1.0.4: the search icon. This is NOT a colour bug — the
             // colour binding (palette.text, near-white on dark /
             // near-black on light) was already high-contrast in both
-            // themes. The glyph was the defect: Iconsax.search_normal
-            // is MALFORMED in iconsax_flutter 1.0.1 — both ring
+            // themes. The glyph was the defect: the base search_normal
+            // glyph is MALFORMED in iconsax_flutter 1.0.1 — both ring
             // contours wind the same way, so with non-zero fill it
             // renders as a solid disc + dot instead of a magnifier
             // (verified against the font file and the v1.0.3 device
@@ -256,6 +256,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: palette.text,
               ),
               onPressed: () => context.go('/search'),
+            ),
+            // The notification bell (Figma Home top bar: logo + search
+            // + bell). It was simply never built — the header Row had
+            // only the search button, which is why the user saw no
+            // bell at all (not a glyph or colour defect: both bell
+            // glyphs were verified against the font file — the Linear
+            // notification_copy renders a clean outline bell, and the
+            // same Linear glyph is used in Settings too since v1.0.5:
+            // no Bold icons remain anywhere in the app). Same high-contrast palette.text binding
+            // as the search button, so it reads in both themes.
+            // No badge dot: there is no unread-notification state in
+            // this build (notifications are in-app only, toggled in
+            // Settings), so a dot would be fake. Tapping shows an
+            // honest "no new notifications" message instead of
+            // opening a notifications screen that does not exist.
+            IconButton(
+              tooltip: tr(context, 'home.notifications'),
+              icon: Icon(
+                Iconsax.notification_copy,
+                color: palette.text,
+              ),
+              onPressed: () =>
+                  showSnack(context, tr(context, 'home.noNotifications')),
             ),
           ],
         ),

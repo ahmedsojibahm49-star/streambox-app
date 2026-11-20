@@ -205,7 +205,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     label: isLast
                         ? tr(context, 'common.getStarted')
                         : tr(context, 'common.next'),
-                    icon: isLast ? Iconsax.play_copy : Iconsax.arrow_right,
+                    icon: isLast ? Iconsax.play_copy : Iconsax.arrow_right_copy,
                     onPressed: _next,
                   ),
                   const SizedBox(height: 24),

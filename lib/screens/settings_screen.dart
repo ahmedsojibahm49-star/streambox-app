@@ -117,7 +117,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _optionPill(
                       context,
                       label: tr(context, 'settings.themeSystem'),
-                      icon: Iconsax.monitor,
+                      icon: Iconsax.monitor_copy,
                       selected: themeMode == ThemeMode.system,
                       onTap: () => _setTheme(ThemeMode.system),
                     ),
@@ -125,7 +125,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _optionPill(
                       context,
                       label: tr(context, 'settings.themeDark'),
-                      icon: Iconsax.moon,
+                      icon: Iconsax.moon_copy,
                       selected: themeMode == ThemeMode.dark,
                       onTap: () => _setTheme(ThemeMode.dark),
                     ),
@@ -133,7 +133,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _optionPill(
                       context,
                       label: tr(context, 'settings.themeLight'),
-                      icon: Iconsax.sun_1,
+                      icon: Iconsax.sun_1_copy,
                       selected: themeMode == ThemeMode.light,
                       onTap: () => _setTheme(ThemeMode.light),
                     ),
@@ -150,7 +150,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _optionPill(
                       context,
                       label: tr(context, 'settings.languageEnglish'),
-                      icon: Iconsax.translate,
+                      icon: Iconsax.translate_copy,
                       selected: locale.languageCode == 'en',
                       onTap: () => _setLocale(const Locale('en')),
                     ),
@@ -158,7 +158,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _optionPill(
                       context,
                       label: tr(context, 'settings.languageBangla'),
-                      icon: Iconsax.translate,
+                      icon: Iconsax.translate_copy,
                       selected: locale.languageCode == 'bn',
                       onTap: () => _setLocale(const Locale('bn')),
                     ),
@@ -171,13 +171,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _sectionLabel(context, 'settings.account'),
           _row(
             context,
-            icon: Iconsax.link,
+            icon: Iconsax.link_copy,
             label: tr(context, 'settings.providers'),
             onTap: () => context.push('/settings/providers'),
           ),
           _row(
             context,
-            icon: Iconsax.cloud,
+            icon: Iconsax.cloud_copy,
             label: tr(context, 'settings.backup'),
             onTap: () => context.push('/backup'),
           ),
@@ -195,7 +195,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Iconsax.notification, size: 22),
+                    const Icon(Iconsax.notification_copy, size: 22),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Text(
@@ -246,14 +246,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _sectionLabel(context, 'profile.about'),
           _row(
             context,
-            icon: Iconsax.info_circle,
+            icon: Iconsax.info_circle_copy,
             label: tr(context, 'settings.aboutApp'),
             trailing: tr(context, 'settings.aboutVersion'),
             onTap: () => _showAbout(context),
           ),
           _row(
             context,
-            icon: Iconsax.code,
+            icon: Iconsax.code_copy,
             label: tr(context, 'settings.developer'),
             trailing: tr(context, 'settings.developerName'),
             onTap: () => context.push('/developer'),
@@ -328,12 +328,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         .bodyMedium
                         ?.copyWith(color: palette.muted),
                   ),
-                const SizedBox(width: 8),
-                Icon(
-                  Iconsax.arrow_right_1,
-                  size: 18,
-                  color: palette.muted,
-                ),
+                // v1.0.5: no trailing chevron — the user asked for no
+                // decorative entry icons on rows. The card + label +
+                // InkWell ripple already say "tappable".
               ],
             ),
           ),

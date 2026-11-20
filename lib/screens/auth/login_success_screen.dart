@@ -91,7 +91,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen>
                         boxShadow: AppColors.glowShadow,
                       ),
                       child: const Icon(
-                        Iconsax.tick_circle,
+                        Iconsax.tick_circle_copy,
                         size: 48,
                         color: Colors.white,
                       ),

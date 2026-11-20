@@ -337,6 +337,8 @@ const Map<String, String> enStrings = {
   'home.details': 'Details',
   'home.refreshFailed': 'Couldn’t refresh providers',
   'home.continueReading': 'Continue reading',
+  'home.notifications': 'Notifications',
+  'home.noNotifications': 'No new notifications',
 
   // Search
   'search.trending': 'Trending',
@@ -392,7 +394,7 @@ const Map<String, String> enStrings = {
   'settings.developer': 'Developer',
   'settings.developerName': 'Jarif Ahmed',
   'settings.aboutBody': 'StreamBox brings anime, movies, manga and manhwa from your own JSON provider catalogs into one place. All of your data stays on this device — there is no server account.',
-  'settings.aboutVersion': 'Version 1.0.4',
+  'settings.aboutVersion': 'Version 1.0.5',
 
   // Details
   'details.notFoundTitle': 'Title not found',

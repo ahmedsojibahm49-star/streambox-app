@@ -260,7 +260,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    Iconsax.info_circle,
+                    Iconsax.info_circle_copy,
                     size: 20,
                     color: AppColors.brand,
                   ),
@@ -276,7 +276,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             ),
             const SizedBox(height: 24),
             _BackupCard(
-              icon: Iconsax.export_1,
+              icon: Iconsax.export_1_copy,
               title: tr(context, 'backup.export'),
               body: tr(context, 'backup.exportDesc'),
               busy: _busy,
@@ -288,7 +288,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             ),
             const SizedBox(height: 16),
             _BackupCard(
-              icon: Iconsax.import_1,
+              icon: Iconsax.import_1_copy,
               title: tr(context, 'backup.import'),
               body: tr(context, 'backup.importDesc'),
               busy: _busy,
@@ -400,7 +400,7 @@ class _BackupCard extends StatelessWidget {
           else
             GhostButton(
               label: buttonLabel,
-              icon: Iconsax.folder_open,
+              icon: Iconsax.folder_open_copy,
               onPressed: busy ? null : onPressed,
             ),
         ],
@@ -460,7 +460,7 @@ class _CodeDialogState extends State<_CodeDialog> {
             controller: _controller,
             label: tr(context, 'auth.deviceCode'),
             hint: tr(context, 'auth.codeHint'),
-            prefixIcon: Iconsax.key,
+            prefixIcon: Iconsax.key_copy,
             autofocus: true,
             onChanged: (_) {
               // Clear the error as soon as the user edits.

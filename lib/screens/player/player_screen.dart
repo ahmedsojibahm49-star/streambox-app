@@ -848,7 +848,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         child: Row(
           children: [
             PlayerControlButton(
-              icon: Iconsax.arrow_left,
+              icon: Iconsax.arrow_left_copy,
               label: tr(context, 'common.back'),
               onPressed: () {
                 if (_isFullscreen) {
@@ -894,7 +894,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           PlayerControlButton(
-            icon: Iconsax.backward_10_seconds,
+            icon: Iconsax.backward_10_seconds_copy,
             label: tr(context, 'player.skipBack10'),
             onPressed: () => _skip(-10),
             size: 52,
@@ -908,7 +908,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           ),
           const SizedBox(width: 28),
           PlayerControlButton(
-            icon: Iconsax.forward_10_seconds,
+            icon: Iconsax.forward_10_seconds_copy,
             label: tr(context, 'player.skipForward10'),
             onPressed: () => _skip(10),
             size: 52,
@@ -946,7 +946,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 _buildSpeedButton(),
                 const Spacer(),
                 PlayerControlButton(
-                  icon: Iconsax.maximize_1,
+                  icon: Iconsax.maximize_1_copy,
                   label: tr(
                     context,
                     _isFullscreen
@@ -1042,7 +1042,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Iconsax.warning_2,
+                      Iconsax.warning_2_copy,
                       size: iconSize,
                       color: AppColors.danger,
                     ),
@@ -1069,14 +1069,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     children: [
                       _buildErrorAction(
                         label: tr(context, 'common.retry'),
-                        icon: Iconsax.refresh,
+                        icon: Iconsax.refresh_copy,
                         height: compact ? 40 : 44,
                         onPressed: () => _loadEpisode(_episodeIndex),
                       ),
                       if (canOpenBrowser)
                         _buildErrorAction(
                           label: tr(context, 'player.openInBrowser'),
-                          icon: Iconsax.export_1,
+                          icon: Iconsax.export_1_copy,
                           height: compact ? 40 : 44,
                           onPressed: _openInBrowser,
                         ),
@@ -1185,7 +1185,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                   const SizedBox(height: 20),
                   _buildErrorAction(
                     label: tr(context, 'player.replay'),
-                    icon: Iconsax.refresh,
+                    icon: Iconsax.refresh_copy,
                     onPressed: () async {
                       await _seekTo(Duration.zero);
                       setState(() => _ended = false);

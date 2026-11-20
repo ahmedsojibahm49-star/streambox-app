@@ -11,7 +11,7 @@ class EmptyState extends StatelessWidget {
     super.key,
     required this.title,
     required this.body,
-    this.icon = Iconsax.folder,
+    this.icon = Iconsax.folder_copy,
     this.actionLabel,
     this.onAction,
   });

@@ -52,7 +52,7 @@ class AppImage extends StatelessWidget {
       height: height,
       color: palette.card,
       alignment: Alignment.center,
-      child: Icon(Iconsax.image, size: 32, color: palette.muted),
+      child: Icon(Iconsax.image_copy, size: 32, color: palette.muted),
     );
   }
 }

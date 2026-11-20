@@ -5,9 +5,12 @@ import '../i18n/i18n.dart';
 import '../theme/app_theme.dart';
 
 /// DOCKED bottom navigation bar: full-width, solid surface, hairline top
-/// border. Five tabs — Home, Search, Manga, Library, Profile. Active tab:
-/// orange icon + label + small gradient dot below the label. Inactive:
-/// Linear icons in muted; active: Bold icons (`_copy` variants).
+/// border. Five tabs — Home, Search, Manga, Library, Profile. Every tab
+/// uses the same Linear (`_copy`) glyph in both states; the active tab is
+/// shown by COLOUR (orange icon + label + a small gradient dot below the
+/// label), never by a filled glyph. In iconsax_flutter 1.0.1 base names
+/// are Bold and `_copy` names are Linear — the opposite of the pubspec
+/// comment (verified against the font file, v1.0.4).
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     super.key,
@@ -21,7 +24,7 @@ class BottomNavBar extends StatelessWidget {
   static const List<_NavTab> _tabs = [
     _NavTab(
       labelKey: 'home.title',
-      icon: Iconsax.home,
+      icon: Iconsax.home_copy,
       activeIcon: Iconsax.home_copy,
     ),
     _NavTab(
@@ -31,17 +34,17 @@ class BottomNavBar extends StatelessWidget {
     ),
     _NavTab(
       labelKey: 'manga.tab',
-      icon: Iconsax.book,
+      icon: Iconsax.book_copy,
       activeIcon: Iconsax.book_copy,
     ),
     _NavTab(
       labelKey: 'library.title',
-      icon: Iconsax.bookmark,
+      icon: Iconsax.bookmark_copy,
       activeIcon: Iconsax.bookmark_copy,
     ),
     _NavTab(
       labelKey: 'profile.title',
-      icon: Iconsax.user,
+      icon: Iconsax.user_copy,
       activeIcon: Iconsax.user_copy,
     ),
   ];

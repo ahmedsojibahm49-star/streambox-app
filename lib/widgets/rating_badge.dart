@@ -20,7 +20,7 @@ class RatingBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Iconsax.star_1, size: 11, color: Color(0xFFFFC531)),
+          const Icon(Iconsax.star_1_copy, size: 11, color: Color(0xFFFFC531)),
           const SizedBox(width: 3),
           Text(
             Formatters.rating(rating),

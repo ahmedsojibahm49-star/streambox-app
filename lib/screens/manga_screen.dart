@@ -97,7 +97,7 @@ class _MangaScreenState extends ConsumerState<MangaScreen> {
               ListTile(
                 title: Text(tr(context, _sortKey(option))),
                 trailing: _sort == option
-                    ? const Icon(Iconsax.tick_circle, color: AppColors.brand)
+                    ? const Icon(Iconsax.tick_circle_copy, color: AppColors.brand)
                     : null,
                 onTap: () => Navigator.of(context).pop(option),
               ),
@@ -194,7 +194,7 @@ class _MangaScreenState extends ConsumerState<MangaScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Iconsax.sort,
+                          const Icon(Iconsax.sort_copy,
                               size: 16, color: AppColors.brand),
                           const SizedBox(width: 6),
                           Text(
@@ -217,7 +217,7 @@ class _MangaScreenState extends ConsumerState<MangaScreen> {
                   ? EmptyState(
                       title: tr(context, 'manga.emptyTitle'),
                       body: tr(context, 'manga.emptyBody'),
-                      icon: Iconsax.book,
+                      icon: Iconsax.book_copy,
                       actionLabel: tr(context, 'home.addProvider'),
                       onAction: () =>
                           context.push('/settings/providers'),

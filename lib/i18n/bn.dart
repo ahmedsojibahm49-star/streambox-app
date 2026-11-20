@@ -339,6 +339,8 @@ const Map<String, String> bnStrings = {
   'home.details': 'বিস্তারিত',
   'home.refreshFailed': 'প্রোভাইডার রিফ্রেশ করা যায়নি',
   'home.continueReading': 'পড়া চালিয়ে যান',
+  'home.notifications': 'নোটিফিকেশন',
+  'home.noNotifications': 'কোনো নতুন নোটিফিকেশন নেই',
 
   // Search
   'search.trending': 'জনপ্রিয়',
@@ -395,7 +397,7 @@ const Map<String, String> bnStrings = {
   'settings.developer': 'ডেভেলপার',
   'settings.developerName': 'Jarif Ahmed',
   'settings.aboutBody': 'StreamBox আপনার নিজের JSON প্রোভাইডার ক্যাটালগ থেকে অ্যানিমে, মুভি, মাঙ্গা ও মানহোয়া এক জায়গায় নিয়ে আসে। আপনার সব তথ্য এই ডিভাইসেই থাকে — কোনো সার্ভার অ্যাকাউন্ট নেই।',
-  'settings.aboutVersion': 'সংস্করণ ১.০.৪',
+  'settings.aboutVersion': 'সংস্করণ ১.০.৫',
 
   // Details
   'details.notFoundTitle': 'শিরোনাম পাওয়া যায়নি',

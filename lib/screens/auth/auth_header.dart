@@ -37,7 +37,7 @@ class AuthHeader extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Iconsax.arrow_left,
+                Iconsax.arrow_left_copy,
                 size: 20,
                 color: palette.text,
               ),

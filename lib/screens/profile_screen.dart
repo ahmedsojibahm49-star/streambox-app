@@ -158,7 +158,7 @@ class ProfileScreen extends ConsumerWidget {
                         BorderRadius.circular(AppColors.radiusM),
                   ),
                   child: const Icon(
-                    Iconsax.key,
+                    Iconsax.key_copy,
                     color: AppColors.brand,
                   ),
                 ),
@@ -197,31 +197,31 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           _row(
             context,
-            icon: Iconsax.setting_2,
+            icon: Iconsax.setting_2_copy,
             label: tr(context, 'settings.title'),
             onTap: () => context.push('/settings'),
           ),
           _row(
             context,
-            icon: Iconsax.cloud,
+            icon: Iconsax.cloud_copy,
             label: tr(context, 'settings.backup'),
             onTap: () => context.push('/backup'),
           ),
           _row(
             context,
-            icon: Iconsax.link,
+            icon: Iconsax.link_copy,
             label: tr(context, 'profile.providers'),
             onTap: () => context.push('/settings/providers'),
           ),
           _row(
             context,
-            icon: Iconsax.info_circle,
+            icon: Iconsax.info_circle_copy,
             label: tr(context, 'profile.about'),
             onTap: () => _showAbout(context),
           ),
           _row(
             context,
-            icon: Iconsax.code,
+            icon: Iconsax.code_copy,
             label: tr(context, 'profile.developer'),
             trailing: tr(context, 'profile.developerName'),
             onTap: () => context.push('/developer'),
@@ -229,7 +229,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           _row(
             context,
-            icon: Iconsax.logout,
+            icon: Iconsax.logout_copy,
             label: tr(context, 'settings.signOut'),
             danger: true,
             onTap: () => _confirmSignOut(context, ref),
@@ -239,7 +239,7 @@ class ProfileScreen extends ConsumerWidget {
           // them — the feature was unreachable.
           _row(
             context,
-            icon: Iconsax.trash,
+            icon: Iconsax.trash_copy,
             label: tr(context, 'auth.deleteAccount'),
             danger: true,
             onTap: () => _confirmDeleteAccount(context, ref),
@@ -312,12 +312,9 @@ class ProfileScreen extends ConsumerWidget {
                         .bodyMedium
                         ?.copyWith(color: palette.muted),
                   ),
-                const SizedBox(width: 8),
-                Icon(
-                  Iconsax.arrow_right_1,
-                  size: 18,
-                  color: palette.muted,
-                ),
+                // v1.0.5: no trailing chevron — the user asked for no
+                // decorative entry icons on rows. The card + label +
+                // InkWell ripple already say "tappable".
               ],
             ),
           ),

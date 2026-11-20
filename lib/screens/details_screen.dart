@@ -35,7 +35,7 @@ class DetailsScreen extends ConsumerWidget {
         body: EmptyState(
           title: tr(context, 'details.notFoundTitle'),
           body: tr(context, 'details.notFoundBody'),
-          icon: Iconsax.folder_open,
+          icon: Iconsax.folder_open_copy,
         ),
       );
     }
@@ -122,7 +122,7 @@ class DetailsScreen extends ConsumerWidget {
                         _metaChip(
                           context,
                           Formatters.rating(item.rating),
-                          icon: Iconsax.star_1,
+                          icon: Iconsax.star_1_copy,
                         ),
                       _metaChip(context, statusLabel(context, item.status)),
                       if (readable && item.chapters.isNotEmpty)
@@ -189,9 +189,10 @@ class DetailsScreen extends ConsumerWidget {
                           _actionButton(
                             context,
                             size: actionSize,
-                            icon: inMyList
-                                ? Iconsax.bookmark_copy
-                                : Iconsax.bookmark,
+                            // v1.0.5: one Linear glyph in both states —
+                            // the saved state is shown by colour (the
+                            // `active` tint), not a filled glyph.
+                            icon: Iconsax.bookmark_copy,
                             tooltip: inMyList
                                 ? tr(context, 'details.inList')
                                 : tr(context, 'details.addToList'),
@@ -226,9 +227,10 @@ class DetailsScreen extends ConsumerWidget {
                           _actionButton(
                             context,
                             size: actionSize,
-                            icon: isFavorite
-                                ? Iconsax.heart_copy
-                                : Iconsax.heart,
+                            // v1.0.5: one Linear glyph in both states —
+                            // the favorite state is shown by colour (the
+                            // `active` tint), not a filled glyph.
+                            icon: Iconsax.heart_copy,
                             tooltip: tr(context, 'details.favorite'),
                             active: isFavorite,
                             onPressed: () async {
@@ -261,7 +263,7 @@ class DetailsScreen extends ConsumerWidget {
                           _actionButton(
                             context,
                             size: actionSize,
-                            icon: Iconsax.share,
+                            icon: Iconsax.share_copy,
                             tooltip: tr(context, 'common.share'),
                             // share_plus is a platform-channel call — the old
                             // code fired it unawaited and unguarded, so a
@@ -410,7 +412,7 @@ class DetailsScreen extends ConsumerWidget {
         : '';
     return Row(
       children: [
-        Icon(Iconsax.clock, size: 14, color: palette.muted),
+        Icon(Iconsax.clock_copy, size: 14, color: palette.muted),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
@@ -562,7 +564,7 @@ class DetailsScreen extends ConsumerWidget {
             number: number,
             title: title,
             subtitle: subtitle,
-            icon: Iconsax.play_circle,
+            icon: Iconsax.play_circle_copy,
             highlighted: isResumeTarget,
             onTap: () => openPlayer(context, item, episode: number),
           ),
@@ -610,7 +612,7 @@ class DetailsScreen extends ConsumerWidget {
                     'count': pageCount.toString(),
                   })
                 : null,
-            icon: Iconsax.book,
+            icon: Iconsax.book_copy,
             highlighted: isResumeTarget,
             onTap: () => openReader(context, item, chapter: number),
           ),

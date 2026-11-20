@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 /// Pause glyph drawn as two clean rounded bars — never a font glyph.
 ///
-/// The Iconsax Bold pause glyph (`Iconsax.pause_copy`) is two fat rounded
+/// The Iconsax pause glyph (`Iconsax.pause_copy`) is two fat rounded
 /// bars that read as "00" at small sizes (the episode-row circle renders
 /// it at 18px). These bars are tall, narrow rectangles with a gap equal to
 /// one bar width, so they read as pause at any size. Same treatment as the

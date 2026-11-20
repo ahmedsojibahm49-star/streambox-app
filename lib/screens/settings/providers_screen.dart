@@ -144,7 +144,7 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Iconsax.refresh),
+                : const Icon(Iconsax.refresh_copy),
             tooltip: tr(context, 'providers.refreshAll'),
             // With no repos the button used to be live and reported a
             // misleading "Provider refreshed" for refreshing nothing.
@@ -156,7 +156,7 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
           ? EmptyState(
               title: tr(context, 'providers.noAddedRepos'),
               body: tr(context, 'providers.subtitle'),
-              icon: Iconsax.global,
+              icon: Iconsax.global_copy,
               actionLabel: tr(context, 'providers.addProvider'),
               onAction: () => context.push('/settings/providers/add'),
             )
@@ -189,7 +189,7 @@ class _ProvidersScreenState extends ConsumerState<ProvidersScreen> {
                 const SizedBox(height: 20),
                 GradientButton(
                   label: tr(context, 'providers.addProvider'),
-                  icon: Iconsax.add_circle,
+                  icon: Iconsax.add_circle_copy,
                   onPressed: () => context.push('/settings/providers/add'),
                 ),
               ],
@@ -216,7 +216,7 @@ class _NoAddedReposCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Iconsax.info_circle, size: 24, color: palette.muted),
+          Icon(Iconsax.info_circle_copy, size: 24, color: palette.muted),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -293,7 +293,7 @@ class _RepoCard extends StatelessWidget {
                       BorderRadius.circular(AppColors.radiusS),
                 ),
                 child: Icon(
-                  repo.isBuiltIn ? Iconsax.folder : Iconsax.global,
+                  repo.isBuiltIn ? Iconsax.folder_copy : Iconsax.global_copy,
                   size: 20,
                   color: palette.onBrand,
                 ),
@@ -357,7 +357,7 @@ class _RepoCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Iconsax.refresh_2, size: 14, color: palette.muted),
+              Icon(Iconsax.refresh_copy, size: 14, color: palette.muted),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -378,12 +378,12 @@ class _RepoCard extends StatelessWidget {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Iconsax.refresh, size: 16),
+                    : const Icon(Iconsax.refresh_copy, size: 16),
                 label: Text(tr(context, 'providers.refresh')),
               ),
               if (onDelete != null)
                 IconButton(
-                  icon: const Icon(Iconsax.trash, size: 20),
+                  icon: const Icon(Iconsax.trash_copy, size: 20),
                   color: AppColors.danger,
                   tooltip: tr(context, 'providers.removeProvider'),
                   // Deleting while a refresh is in flight resurrects the
